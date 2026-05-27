@@ -11,3 +11,7 @@ TEMP_MAX_REBOILER = 204.0      # °C Límite degradación térmica del TEG
 
 # --- PLANTA CRIOGÉNICA (COMPLEJO CERRI) ---
 TEMP_CRITICA_TURBOEXP = -90.0  # °C Temperatura de diseño para licuables
+
+LIMITE_HUMEDAD = 64.0        # mg/m3 máximo (Especificación de Custodia)
+PRESION_MAX_PLANTA = 6500.0   # kPa Máximo en Colector de Entrada
+TEMP_MAX_REBOILER = 204.0     # °C Límite del TEG para evitar degradación
