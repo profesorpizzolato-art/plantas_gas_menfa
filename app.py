@@ -64,3 +64,39 @@ elif menu == "Matriz de Seguridad (NAG-125)":
 
 elif menu == "Evaluación Técnica":
     render_evaluacion()
+# app.py
+import streamlit as st
+from modulos.manual_digital import render_manual
+from modulos.evaluacion import render_evaluacion
+from modulos.normativo import render_normativo
+from modulos.cognitivo import render_cognitivo
+
+st.set_page_config(page_title="MENFA - Entrenamiento Integrado", layout="wide")
+
+# Inicialización de estados de sesión
+if 'p_entrada' not in st.session_state:
+    st.session_state.nivel_liquido = 45
+
+# Menú lateral estructurado por pilares de formación profesional
+st.sidebar.title("🏭 MENFA Gas & Proceso")
+st.sidebar.markdown("### Sistema de Entrenamiento Integrado")
+
+pilar_seleccionado = st.sidebar.radio("📚 Pilares de Capacitación:", [
+    "1. Manual Técnico Digital",
+    "2. Sistema de Evaluación",
+    "3. Entrenamiento Normativo",
+    "4. Entrenamiento Cognitivo Operacional"
+])
+
+st.sidebar.markdown("---")
+st.sidebar.caption("Desarrollado para la formación avanzada de técnicos y operadores de plantas de proceso.")
+
+# Enrutador de módulos
+if "Manual" in pilar_seleccionado:
+    render_manual()
+elif "Evaluación" in pilar_seleccionado:
+    render_evaluacion()
+elif "Normativo" in pilar_seleccionado:
+    render_normativo()
+elif "Cognitivo" in pilar_seleccionado:
+    render_cognitivo()
