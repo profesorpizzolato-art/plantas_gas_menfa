@@ -1,0 +1,10 @@
+planta_gas_app/
+│
+├── app.py                 # Archivo principal (Orquestador de Streamlit)
+├── config.py              # Configuraciones globales, estilos y límites de alarma
+│
+└── modulos/               # Carpeta con los bloques lógicos y visuales
+    ├── __init__.py
+    ├── separacion.py      # Módulo 1: Separadores de entrada y lógicas de CDE (ESD)
+    ├── tratamiento.py     # Módulo 2: Deshidratación (TEG) y Endulzamiento (Aminas)
+    └── calidad_medicion.py # Módulo 3: Parámetros de custodia (64 mg/m3) y evaluación
