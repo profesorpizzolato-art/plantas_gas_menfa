@@ -1,10 +1,13 @@
 planta_gas_app/
 │
-├── app.py                 # Archivo principal (Orquestador de Streamlit)
-├── config.py              # Configuraciones globales, estilos y límites de alarma
+├── app.py                 # Orquestador Principal y Navegación
+├── config.py              # Parámetros, Constantes y Límites (Normas NAG-125 y TGS)
 │
-└── modulos/               # Carpeta con los bloques lógicos y visuales
+└── modulos/
     ├── __init__.py
-    ├── separacion.py      # Módulo 1: Separadores de entrada y lógicas de CDE (ESD)
-    ├── tratamiento.py     # Módulo 2: Deshidratación (TEG) y Endulzamiento (Aminas)
-    └── calidad_medicion.py # Módulo 3: Parámetros de custodia (64 mg/m3) y evaluación
+    ├── separacion.py      # Separadores, Slug Catchers y Alarmas de Líquidos
+    ├── tratamiento.py     # Deshidratación por TEG y Calidad de Gas (<64 mg/m³)
+    ├── procesamiento.py   # Planta Criogénica / Turboexpansión (Separación de NGL / Cerri)
+    ├── transporte.py      # Estación Compresora y Control de Gasoductos (Presión/Scrapers)
+    ├── seguridad.py       # Matriz de Enclavamiento, Fire & Gas y ESD según NAG-125
+    └── evaluacion.py      # Consola del Instructor y Banco de Preguntas Técnicas
