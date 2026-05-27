@@ -1,6 +1,7 @@
 # modulos/transporte.py
 import streamlit as st
 import numpy as np
+import pandas as pd  # <--- CORRECCIÓN: Agregada la importación que faltaba
 
 def render_transporte():
     st.header("🚀 Estación Compresora y Despacho a Gasoducto")
@@ -23,11 +24,14 @@ def render_transporte():
         if rc > 3.0:
             st.warning("⚠️ Rc elevada: Alta temperatura de descarga esperada. Requiere postenfriamiento.")
             
-        # Pérdida de carga simulada a lo largo del gasoducto (Ecuación simplificada de Weymouth)
+        # Pérdida de carga simulada a lo largo del gasoducto (Ecuación de caída lineal para visualización)
         distancia = np.linspace(0, 100, 50)
-        presion_linea = p_descarga - (distancia * 12)  # Caída lineal de prueba
+        presion_linea = p_descarga - (distancia * 12)  # Simulación de pérdida de carga por fricción
         
-        st.line_chart(pd.DataFrame({"Presión en Gasoducto (kPa)": presion_linea}, index=distancia))
-        st.caption("Perfil de presión estimado a lo largo de 100 km de gasoducto.")
+        # Crear el DataFrame correctamente con la librería importada
+        df_grafico = pd.DataFrame({"Presión en Gasoducto (kPa)": presion_linea}, index=distancia)
+        
+        st.line_chart(df_grafico)
+        st.caption("Perfil de presión estimado a lo largo de 100 km de gasoducto (Simulación de fricción).")
         
     return p_descarga
