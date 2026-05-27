@@ -1,102 +1,90 @@
 # app.py
 import streamlit as st
-from modulos.separacion import render_separacion
-from modulos.tratamiento import render_tratamiento
-from modulos.procesamiento import render_procesamiento
-from modulos.transporte import render_transporte
-from modulos.seguridad import procesar_matriz_seguridad
-from modulos.calidad_medicion import render_evaluacion
 
-st.set_page_config(page_title="MENFA - Simulador Integrado de Gas", layout="wide")
+# Configuración visual unificada de la plataforma MENFA
+st.set_page_config(page_title="MENFA - Simulador Gas Integrado", layout="wide")
 
-st.title("🏭 MENFA - Simulador de Plantas de Procesamiento y Gasoductos")
-st.caption("Plataforma integrada de capacitación técnica basada en normativas operativas de la industria del gas natural.")
+st.title("🏭 MENFA - Suite de Simulación y Entrenamiento Integrado")
+st.caption("Consola unificada para la formación técnica y operativa en plantas de procesamiento y gasoductos.")
 
-# --- INICIALIZACIÓN DE VARIABLES EN SESIÓN ---
+# --- INICIALIZACIÓN DE VARIABLES EN SESIÓN GLOBAL ---
 if 'p_entrada' not in st.session_state:
-    st.session_state.p_entrada = 3500
-    st.session_state.t_entrada = 20
-    st.session_state.nivel_liquido = 45
-    st.session_state.p_descarga_gasoducto = 6100
+    st.session_state.p_entrada = 3500.0
+    st.session_state.t_entrada = 20.0
+    st.session_state.nivel_liquido = 45.0
+    st.session_state.p_descarga_gasoducto = 6100.0
+    st.session_state.humedad_salida = 24.5
+    st.session_state.temp_reboiler = 182.0
 
-# --- NAVEGACIÓN ---
-menu = st.sidebar.radio("📋 Secciones de la Planta", [
-    "Panel General Operativo",
+# --- MENÚ LATERAL DE NAVEGACIÓN ---
+st.sidebar.title("🎛️ Matriz Operativa")
+seccion = st.sidebar.radio("Seleccione el Módulo de Trabajo:", [
+    "Panel Control General",
     "Separación de Entrada",
     "Tratamiento (TEG)",
     "Planta Criogénica",
     "Compresión y Gasoductos",
+    "Calidad y Medición",
     "Matriz de Seguridad (NAG-125)",
-    "Evaluación Técnica"
+    "1. Manual Técnico Digital",
+    "2. Sistema de Evaluación",
+    "3. Entrenamiento Normativo",
+    "4. Entrenamiento Cognitivo"
 ])
 
-# --- MENÚ LATERAL DE MONITOREO RÁPIDO ---
 st.sidebar.markdown("---")
-st.sidebar.markdown("### 🚦 Alertas del Sistema")
-procesar_matriz_seguridad() # Se ejecuta en segundo plano para actualizar alarmas
+st.sidebar.info("📌 **Control de Gestión:** Simulador configurado bajo normas de transporte y seguridad industrial.")
 
-# --- CONTROLADORES DE RENDERIZADO DE INTERFAZ ---
-if menu == "Panel General Operativo":
-    st.subheader("📊 Panel General de Supervisión (KPIs)")
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Presión Entrada", f"{st.session_state.p_entrada} kPa")
-    col2.metric("Presión Despacho", f"{st.session_state.p_descarga_gasoducto} kPa")
-    col3.metric("Nivel Separador", f"{st.session_state.nivel_liquido} %")
+# --- IMPORTACIÓN EN TIEMPO DE EJECUCIÓN (Previene errores de dependencias cruzadas) ---
+if seccion == "Panel Control General":
+    st.subheader("📊 Resumen Operativo de la Planta")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Presión Entrada", f"{st.session_state.p_entrada:.1f} kPa")
+    col2.metric("Presión Despacho", f"{st.session_state.p_descarga_gasoducto:.1f} kPa")
+    col3.metric("Nivel Separador", f"{st.session_state.nivel_liquido:.1f} %")
+    col4.metric("Calidad Gas", f"{st.session_state.humedad_salida:.1f} mg/m³")
 
-elif menu == "Separación de Entrada":
+elif seccion == "Separación de Entrada":
+    from modulos.separacion import render_separacion
     p, t, nv = render_separacion()
     st.session_state.p_entrada = p
     st.session_state.t_entrada = t
     st.session_state.nivel_liquido = nv
 
-elif menu == "Tratamiento (TEG)":
-    render_tratamiento(st.session_state.p_entrada, st.session_state.t_entrada)
+elif seccion == "Tratamiento (TEG)":
+    from modulos.tratamiento import render_tratamiento
+    h_salida, t_reb = render_tratamiento(st.session_state.p_entrada, st.session_state.t_entrada)
+    st.session_state.humedad_salida = h_salida
+    st.session_state.temp_reboiler = t_reb
 
-elif menu == "Planta Criogénica":
+elif seccion == "Planta Criogénica":
+    from modulos.procesamiento import render_procesamiento
     render_procesamiento(st.session_state.p_entrada, st.session_state.t_entrada)
 
-elif menu == "Compresión y Gasoductos":
-    p_desc = render_transporte()
-    st.session_state.p_descarga_gasoducto = p_desc
+elif seccion == "Compresión y Gasoductos":
+    from modulos.transporte import render_transporte
+    st.session_state.p_descarga_gasoducto = render_transporte()
 
-elif menu == "Matriz de Seguridad (NAG-125)":
-    st.info("Consulte la pestaña lateral para ver la lógica de enclavamiento activa.")
+elif seccion == "Calidad y Medición":
+    from modulos.calidad_medicion import render_calidad_medicion
+    render_calidad_medicion()
 
-elif menu == "Evaluación Técnica":
-    render_evaluacion()
-# app.py
-import streamlit as st
-from modulos.manual_digital import render_manual
-from modulos.evaluacion import render_evaluacion
-from modulos.normativo import render_normativo
-from modulos.cognitivo import render_cognitivo
+elif seccion == "Matriz de Seguridad (NAG-125)":
+    from modulos.seguridad import render_seguridad
+    render_seguridad()
 
-st.set_page_config(page_title="MENFA - Entrenamiento Integrado", layout="wide")
-
-# Inicialización de estados de sesión
-if 'p_entrada' not in st.session_state:
-    st.session_state.nivel_liquido = 45
-
-# Menú lateral estructurado por pilares de formación profesional
-st.sidebar.title("🏭 MENFA Gas & Proceso")
-st.sidebar.markdown("### Sistema de Entrenamiento Integrado")
-
-pilar_seleccionado = st.sidebar.radio("📚 Pilares de Capacitación:", [
-    "1. Manual Técnico Digital",
-    "2. Sistema de Evaluación",
-    "3. Entrenamiento Normativo",
-    "4. Entrenamiento Cognitivo Operacional"
-])
-
-st.sidebar.markdown("---")
-st.sidebar.caption("Desarrollado para la formación avanzada de técnicos y operadores de plantas de proceso.")
-
-# Enrutador de módulos
-if "Manual" in pilar_seleccionado:
+elif seccion == "1. Manual Técnico Digital":
+    from modulos.manual_digital import render_manual
     render_manual()
-elif "Evaluación" in pilar_seleccionado:
+
+elif seccion == "2. Sistema de Evaluación":
+    from modulos.evaluacion import render_evaluacion
     render_evaluacion()
-elif "Normativo" in pilar_seleccionado:
+
+elif seccion == "3. Entrenamiento Normativo":
+    from modulos.normativo import render_normativo
     render_normativo()
-elif "Cognitivo" in pilar_seleccionado:
+
+elif seccion == "4. Entertainmento Cognitivo":
+    from modulos.cognitivo import render_cognitivo
     render_cognitivo()
