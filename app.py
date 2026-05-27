@@ -85,6 +85,7 @@ elif seccion == "3. Entrenamiento Normativo":
     from modulos.normativo import render_normativo
     render_normativo()
 
-elif seccion == "4. Entertainmento Cognitivo":
+# CORRECCIÓN: Se cambió "Entertainmento" por "Entrenamiento" para que coincida exactamente con el radio button
+elif seccion == "4. Entrenamiento Cognitivo":
     from modulos.cognitivo import render_cognitivo
     render_cognitivo()
