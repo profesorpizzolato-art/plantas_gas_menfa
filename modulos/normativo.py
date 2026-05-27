@@ -2,20 +2,13 @@
 import streamlit as st
 
 def render_normativo():
-    st.header("⚖️ Entrenamiento Normativo y Cumplimiento de Seguridad")
-    st.subheader("Matriz de Inspecciones Obligatorias según NAG-125")
+    st.header("⚖️ Pilar 3: Entrenamiento Normativo (Norma NAG-125)")
+    st.write("Cronograma mandatorio de inspección y calibración periódica exigido por Gas del Estado.")
     
-    st.markdown("""
-    De acuerdo con la reglamentación aplicable a plantas de tratamiento y acondicionamiento de gas, 
-    los elementos críticos de protección e interlocks deben cumplir con frecuencias estrictas de control.
-    """)
-    
-    # Tabla de cumplimiento normativo interactiva
-    data_norma = {
-        "Elemento de Protección": ["Válvulas de Bloqueo (ESD)", "Tanque Espumígeno C/Incendio", "Válvulas de Seguridad (PSV)", "Detectores de Gas/Fuego"],
-        "Frecuencia Obligatoria": ["Mensual (Accionamiento)", "Diario (Nivel) / Anual (Ensayo)", "Anual (Calibración)", "Semestral (Contraste)"],
-        "Estado en Planta": ["Cumplido ✅", "Cumplido ✅", "Pendiente ⚠️", "Cumplido ✅"]
+    cronograma = {
+        "Elemento de Seguridad": ["Válvulas de Cierre de Emergencia (ESD)", "Detectores de Mezclas Explosivas", "Válvulas de Alivio de Presión (PSV)"],
+        "Frecuencia de Ensayo Legal": ["Mensual (Accionamiento completo)", "Semestral (Contraste y Calibración)", "Anual (Desmontaje y Banco)"],
+        "Estado de Cumplimiento": ["CUMPLIDO ✅", "CUMPLIDO ✅", "VENCIDO ⚠️ Requiere Calibración"]
     }
-    st.table(data_norma)
-    
-    st.warning("⚠️ **Alerta de Auditoría:** La calibración quinquenal de espesores y anual de PSVs en líneas de alta presión está próxima a vencer.")
+    st.table(cronograma)
+    st.warning("🚨 **Alerta de Auditoría:** La PSV del colector registra 14 meses desde su último ensayo. Regularizar de inmediato.")
