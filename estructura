@@ -1,13 +1,11 @@
 planta_gas_app/
 │
-├── app.py                 # Orquestador Principal y Navegación
-├── config.py              # Parámetros, Constantes y Límites (Normas NAG-125 y TGS)
+├── app.py                 # Orquestador y Navegación Principal
+├── config.py              # Parámetros técnicos y límites de alarma (NAG-125)
 │
 └── modulos/
     ├── __init__.py
-    ├── separacion.py      # Separadores, Slug Catchers y Alarmas de Líquidos
-    ├── tratamiento.py     # Deshidratación por TEG y Calidad de Gas (<64 mg/m³)
-    ├── procesamiento.py   # Planta Criogénica / Turboexpansión (Separación de NGL / Cerri)
-    ├── transporte.py      # Estación Compresora y Control de Gasoductos (Presión/Scrapers)
-    ├── seguridad.py       # Matriz de Enclavamiento, Fire & Gas y ESD según NAG-125
-    └── evaluacion.py      # Consola del Instructor y Banco de Preguntas Técnicas
+    ├── manual_digital.py  # 📚 PILAR 1: Manual Técnico de Consulta Rápida
+    ├── evaluacion.py      # 📝 PILAR 2: Sistema de Evaluación Computada (Examen)
+    ├── normativo.py       # ⚖️ PILAR 3: Entrenamiento Normativo (Leyes y NAG)
+    └── cognitivo.py       # 🧠 PILAR 4: Entrenamiento Cognitivo Operacional (Simulador de Fallas)
