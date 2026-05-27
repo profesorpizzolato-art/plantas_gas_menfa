@@ -1,5 +1,13 @@
-# Límites operativos y de seguridad basados en especificaciones de transporte
-LIMITE_HUMEDAD_M3 = 64.0       # mg/m3 máximo permitido
-LIMITE_PRESION_MAX = 6500.0    # kPa máximo en colector de entrada
-LIMITE_NIVEL_LIQUIDO = 90.0    # % máximo para disparo por nivel
-LIMITE_TEMP_REBOILER = 204.0   # °C máxima para evitar degradación del TEG
+# --- ESPECIFICACIONES DE CALIDAD DE CUSTODIA ---
+LIMITE_HUMEDAD_M3 = 64.0       # mg/m3 máximo permitido (Manual de Gas)
+LIMITE_H2S = 4.0               # ppm máximo (Gas Dulce)
+LIMITE_CO2 = 2.0               # % molar máximo permitido
+
+# --- LÍMITES DE SEGURIDAD OPERATIVA ---
+PRESION_MAX_COLECTOR = 6500.0  # kPa (Separación de Entrada)
+PRESION_MAX_GASODUCTO = 7400.0 # kPa (Límite típico de diseño / Manual Gasoductos)
+NIVEL_LIQUIDO_CRITICO = 90.0   # % Nivel máximo en separadores antes de CDE
+TEMP_MAX_REBOILER = 204.0      # °C Límite degradación térmica del TEG
+
+# --- PLANTA CRIOGÉNICA (COMPLEJO CERRI) ---
+TEMP_CRITICA_TURBOEXP = -90.0  # °C Temperatura de diseño para licuables
