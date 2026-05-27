@@ -1,17 +1,24 @@
-# --- ESPECIFICACIONES DE CALIDAD DE CUSTODIA ---
-LIMITE_HUMEDAD_M3 = 64.0       # mg/m3 máximo permitido (Manual de Gas)
-LIMITE_H2S = 4.0               # ppm máximo (Gas Dulce)
-LIMITE_CO2 = 2.0               # % molar máximo permitido
+# config.py
 
-# --- LÍMITES DE SEGURIDAD OPERATIVA ---
-PRESION_MAX_COLECTOR = 6500.0  # kPa (Separación de Entrada)
-PRESION_MAX_GASODUCTO = 7400.0 # kPa (Límite típico de diseño / Manual Gasoductos)
-NIVEL_LIQUIDO_CRITICO = 90.0   # % Nivel máximo en separadores antes de CDE
-TEMP_MAX_REBOILER = 204.0      # °C Límite degradación térmica del TEG
+# =====================================================================
+# 1. ESPECIFICACIONES DE CALIDAD DE CUSTODIA (Puntos de Entrega / Red)
+# =====================================================================
+LIMITE_HUMEDAD = 64.0         # mg/m³ máximo permitido (Manual de Gas TGS)
+LIMITE_H2S = 4.0              # ppm máximo para Gas Dulce (Contaminantes)
+LIMITE_CO2 = 2.0              # % molar máximo permitido
 
-# --- PLANTA CRIOGÉNICA (COMPLEJO CERRI) ---
-TEMP_CRITICA_TURBOEXP = -90.0  # °C Temperatura de diseño para licuables
+# =====================================================================
+# 2. LÍMITES DE SEGURIDAD OPERATIVA E INTERLOCKS (NAG-125 / Gasoductos)
+# =====================================================================
+PRESION_MAX_PLANTA = 6500.0   # kPa Máximo en Colector (Separación de Entrada)
+PRESION_MAX_GASODUCTO = 7400.0 # kPa Límite típico de diseño (Manual de Gasoductos)
+TEMP_MAX_REBOILER = 204.0     # °C Límite operativo para evitar degradación del TEG
 
-LIMITE_HUMEDAD = 64.0        # mg/m3 máximo (Especificación de Custodia)
-PRESION_MAX_PLANTA = 6500.0   # kPa Máximo en Colector de Entrada
-TEMP_MAX_REBOILER = 204.0     # °C Límite del TEG para evitar degradación
+# Control de Niveles de Líquido en Separadores / Slug Catchers
+NIVEL_LIQUIDO_CRITICO = 90.0  # % Nivel máximo para disparo automático
+NIVEL_MAX_SEPARADOR = 90.0    # Alias para asegurar compatibilidad modular
+
+# =====================================================================
+# 3. PARÁMETROS CRÍTICOS DE PLANTA CRIOGÉNICA (Complejo Cerri)
+# =====================================================================
+TEMP_CRITICA_TURBOEXP = -90.0 # °C Temperatura de diseño para extracción de licuables
