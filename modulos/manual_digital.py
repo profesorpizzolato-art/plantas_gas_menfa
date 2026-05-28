@@ -7,7 +7,7 @@ import config as cfg
 
 def render_manual():
     st.header("📚 Pilar 1: Manual Técnico Digital de Operaciones de Planta")
-    st.caption("Enciclopedia avanzada de ingeniería de procesos, termodinámica y procedimientos operativos estándar.")
+    st.caption("Enciclopedia avanzada de ingeniería de procesos, termodinámica de hidrocarburos y filosofías instrumentadas de seguridad.")
     st.markdown("---")
     
     capitulo = st.selectbox("Seleccione el módulo de ingeniería de detalle a estudiar:", [
@@ -33,17 +33,22 @@ def render_manual():
         """)
         st.latex(r"P = \frac{R \cdot T}{V - b} - \frac{a(T)}{V \cdot (V + b) + b \cdot (V - b)}")
         st.write("""
-        Donde $a(T)$ representa las fuerzas de atracción intermoleculares y $b$ es el co-volumen molecular. A partir de estas ecuaciones se calcula el **Factor de Compresibilidad ($Z$)**, crucial para la determinación del volumen real de despacho: $P \cdot V = Z \cdot n \cdot R \cdot T$.
+        * **Parámetro $a(T)$:** Representa las fuerzas de atracción intermoleculares de la mezcla.
+        * **Parámetro $b$:** Representa el **co-volumen molecular**, que es el espacio físico mínimo e infranqueable ocupado por las propias moléculas de gas real, restándoselo al espacio libre disponible.
+        
+        A partir de estas ecuaciones se calcula el **Factor de Compresibilidad ($Z$)**: $P \cdot V = Z \cdot n \cdot R \cdot T$. Cuando las fuerzas de atracción molecular predominan, el factor Z cae por debajo de 1.0 ($Z < 1$), facilitando la compresión del gas. A presiones extremas (superiores a 7000 kPa), la precisión de las EOS cúbicas disminuye, prefiriéndose para transferencias de custodia el modelo de coeficientes de virial extendido **AGA8**.
+        
+        Adicionalmente, la presencia de componentes intermedios y pesados ($C_3, C_4$) expande considerablemente la envolvente de fases de la mezcla, desplazando la **cricondembara** y la región de dos fases hacia valores de presión y temperatura sustancialmente más elevados.
         """)
         
-        # Gráfica interactiva de código: Factor Z vs Presión
+        # Gráfica interactiva: Factor Z vs Presión
         st.markdown("#### 📈 Panel Interactivo: Factor de Compresibilidad $Z$")
-        st.caption("Simulación del comportamiento de la desviación del gas ideal según la presión operativa a temperatura de colector.")
+        st.caption("Simulación de la desviación del gas ideal según la presión operativa a temperatura de colector.")
         
         p_rango = np.linspace(100, 10000, 100) # kPa
         z_rango = 1.0 - (p_rango * 0.00004) + (p_rango**2 * 2.5e-9)
         
-        # Sanitización de datos para Plotly
+        # Sanitización explícita para evitar ValueErrors en Plotly
         x_p = [float(p) for p in p_rango]
         y_z = [float(z) for z in z_rango]
         y_ideal = [1.0] * len(x_p)
@@ -61,27 +66,33 @@ def render_manual():
         )
         st.plotly_chart(fig_z, use_container_width=True)
         
-        st.subheader("1.2 Mecanismo de Formación y Disociación de Hidratos")
+        st.subheader("1.2 Mecanismo de Formación e Inhibición de Hidratos")
         st.write("""
         Los hidratos de gas son clatratos cristalinos estables. No se trata de la congelación del agua, sino de un cambio de fase termodinámico donde el agua actúa como "jaula" (huésped) reteniendo hidrocarburos livianos. 
         
-        **Límites de Operación Segura:** Si el gas opera en el área derecha de la curva de equilibrio (Alta temperatura, baja presión), el agua libre permanece líquida y puede ser drenada. Si cruza a la izquierda, la cristalización obstruirá válvulas de control y cañerías de forma irreversible.
+        **Efecto de la Presión:** El aumento de presión en el Colector de Entrada eleva la temperatura de formación de hidratos, desplazando el equilibrio operativo hacia la zona de riesgo. 
+        
+        **Estrategias de Mitigación:**
+        * **Inhibidores Termodinámicos (Metanol / MEG):** Rompen los puentes de hidrógeno del agua líquida, desplazando de raíz la curva de equilibrio hacia temperaturas mucho más frías (zonas seguras).
+        * **Inhibidores Cinéticos (KHI):** Polímeros que no alteran la termodinámica, sino que se adhieren a los microcristales retardando significativamente su nucleación y crecimiento mecánico.
         """)
 
     # =========================================================================
     # MÓDULO II: HIDRÁULICA DE SEPARACIÓN Y GESTIÓN DE SLUGS
     # =========================================================================
     elif "Módulo II" in capitulo:
-        st.subheader("2.1 Diseño Hidráulico y Tiempo de Residencia en Slug Catchers")
+        st.subheader("2.1 Diseño Hidráulico y Fenómenos de Arrastre")
         st.write("""
-        El diseño de un separador de entrada o Slug Catcher de tipo de dedos (Finger Type) o de recipiente horizontal responde a la capacidad de disipar la energía cinética del fluido multifásico entrante. 
-        La separación de la fase líquida pesada se rige por el desprendimiento gravitacional. El criterio fundamental de diseño estructural es la **Ecuación de Souders-Brown**, que define la velocidad máxima permitida del gas para evitar el arrastre por cabeza (*Carry-over*):
+        La separación primaria en los recipientes mecánicos o en los **Slug Catchers tipo 'Finger' (de dedos)** aprovecha la segregación gravitatoria a lo largo de cañerías paralelas con pendiente descendente. El criterio estructural e hidráulico para evitar fallas críticas se rige por la **Ecuación de Souders-Brown**, que calcula la velocidad máxima permitida del gas ($v_{max}$) para evitar el arrastre por cabeza (*Carry-over*):
         """)
         st.latex(r"v_{max} = K \cdot \sqrt{\frac{\rho_l - \rho_g}{\rho_g}}")
         st.write("""
-        Donde $K$ es un factor empírico de diseño mecánico dependiente de la geometría interna y el uso de mallas desnebulizadoras (*Demister pads*).
+        * **Efecto de una Sobrepresión:** Si la presión en la línea se eleva, la densidad del gas ($\rho_g$) aumenta, disminuyendo la diferencia $(\rho_l - \rho_g)$. Esto reduce la velocidad límite permitida ($v_{max}$) y exige regular el caudal total de entrada para mantener la eficiencia de separación.
         
-        **Tiempo de Residencia:** El volumen de líquidos debe dimensionarse para retener el bache el tiempo suficiente para que las burbujas de gas atrapadas en el líquido migren hacia arriba (*Carry-under*), típicamente entre 5 y 10 minutos.
+        **Fenómenos Críticos de Operación:**
+        * **Carry-over (Arrastre por cabeza):** Gotas líquidas suspendidas escapan por el tope de gas, saturando la malla desnebulizadora (*Demister Pad*). Si el demister se obstruye por sales o parafinas, la presión diferencial ($\Delta P$) medida entre la entrada y salida subirá drásticamente.
+        * **Carry-under (Arrastre por fondo):** Burbujas de gas quedan atrapadas e inundan la fase líquida saliente. Ocurre por un bajo tiempo de residencia o niveles operativos deficientes en el fondo del separador.
+        * **Deflector de Entrada (Inlet Deflector):** Dispositivo mecánico encargado de reducir bruscamente el momento lineal del fluido multifásico entrante, logrando una pre-separación gruesa y direccionando los líquidos hacia el fondo de acumulación de forma balanceada.
         """)
         
         st.markdown("#### 📈 Gráfica de Control: Velocidad Crítica de Souders-Brown")
@@ -91,7 +102,6 @@ def render_manual():
         k_factor = 0.11  
         v_critica = k_factor * np.sqrt((rho_l - rho_g) / rho_g)
         
-        # DataFrame limpio y estructurado para Streamlit nativo
         df_v = pd.DataFrame({
             "Presión Colector (kPa)": pressures,
             "Velocidad Límite del Gas (m/s)": v_critica
@@ -100,66 +110,63 @@ def render_manual():
         st.line_chart(df_v)
         st.caption("A mayor presión de operación, la densidad del gas aumenta, disminuyendo la velocidad límite permitida dentro del separador para evitar el arrastre.")
 
-        st.subheader("2.2 Procedimiento Operativo Estándar (SOP): Limpieza de Gasoductos (Scraping)")
-        st.write("""
-        Ante una corrida programada de un *scraper* (chancho de limpieza) en el gasoducto de alimentación, el operador de panel debe ejecutar el siguiente protocolo estricto:
-        1. **Verificación de Inventario:** Deprimir el nivel operativo del slug catcher al mínimo técnico posible (ej. 15%-20%) para maximizar el volumen de amortiguación disponible.
-        2. **Monitoreo de Presión Diferencial:** Observar el incremento de $\Delta P$ en el receptor de chanchos.
-        3. **Control de Drenaje:** Seteo del lazo de control de nivel ($LIC$) en modo automático-asistido o manual al 80% de apertura de la $LCV$ de fondo para derivar el condensado hacia los tanques de estabilización en cuanto impacte el frente líquido.
-        """)
-
     # =========================================================================
     # MÓDULO III: TRANSFERENCIA DE MASA EN TORRES DE TEG
     # =========================================================================
     elif "Módulo III" in capitulo:
-        st.subheader("3.1 Cinética de Transferencia de Masa e Hidrodinámica")
+        st.subheader("3.1 Cinética de la Deshidratación por Trietilenglicol (TEG)")
         st.write("""
-        La absorción del vapor de agua en el Trietilenglicol (TEG) es un proceso de transferencia de masa interfacil no reactivo. La tasa de transferencia está determinada por la ley de difusión y el número de platos teóricos de equilibrio (comúnmente entre 4 y 6 platos reales).
+        La absorción del vapor de agua en el TEG es un proceso de transferencia de masa interfacial no reactivo. La tasa de transferencia normalizada exige una tasa de circulación equilibrada (típicamente **de 1.5 a 3.0 galones de TEG por cada libra de agua a remover**). 
         
-        La eficiencia de remoción de agua es directamente proporcional a la tasa de circulación del glicol pobre (típicamente de **1.5 a 3.0 galones de TEG por cada libra de agua a remover**) y a la pureza del glicol regenerado.
+        Una tasa de circulación excesiva ($> 4.5\\text{ gal/lb }H_2O$) causa una severa sobrecarga térmica en el reboiler, aumenta el consumo de combustible y eleva el arrastre perjudicial de compuestos orgánicos volátiles (VOCs) en las líneas de venteo.
+        
+        **Dinámica de Equipos del Lazo:**
+        1. **Torre Contactora:** El gas húmedo fluye en contracorriente con el glicol pobre. La temperatura del glicol de entrada debe mantenerse estrictamente **entre 3 °C y 5 °C por encima de la temperatura del gas**. Si entra más frío, inducirá la condensación indeseada de hidrocarburos gaseosos, provocando el fenómeno de **espumado (foaming)**.
+        2. **Flash Drum (Tanque de Flasheo):** Opera a baja presión (300-500 kPa) retirando por descompresión los hidrocarburos gaseosos disueltos en el glicol rico antes de que ingresen al tren térmico.
+        3. **Reboiler y Columna de Regeneración:** El reboiler debe operar en un rango estricto de **195 °C a 202 °C**. Superar los $204^\\circ\\text{C}$ destruye térmicamente la molécula de TEG. Para alcanzar purezas superiores al 99.5%, se inyecta **Stripping Gas** en la base de la columna para reducir la presión parcial del vapor de agua y forzar el despojamiento molecular definitivo.
         """)
         
         st.markdown("#### 📈 Simulador de Sensibilidad: Tasa de Inyección de TEG")
         tasa_circ = st.slider("Tasa de Inyección de TEG (Galones/lb H2O):", 1.0, 4.0, 2.0, step=0.5)
-        
         h_salida_sim = 120.0 / (tasa_circ * 1.8)
-        
-        # Protección ante configuraciones faltantes en config.py
-        limite_h = getattr(cfg, "LIMITE_HUMEDAD", 64.0)
+        limite_h = float(getattr(cfg, "LIMITE_HUMEDAD", 64.0))
         
         st.metric("Humedad Estimada de Salida", f"{h_salida_sim:.1f} mg/m³", 
                   delta="DENTRO DE NORMA" if h_salida_sim <= limite_h else "FUERA DE ESPECIFICACIÓN",
                   delta_color="normal" if h_salida_sim <= limite_h else "inverse")
 
-        st.subheader("3.2 Guía de Resolución de Fallas Críticas (Troubleshooting)")
+        st.subheader("3.2 Resolución de Anomalías de Proceso (Troubleshooting)")
         st.write("""
-        * **Síntoma: Incremento repentino de la Humedad en el Gas de Venta ($>64 \\text{ mg/m}^3$)**
-          1. *Causa:* Tasa de circulación de glicol insuficiente. *Acción:* Verificar amperaje y carrera de las bombas operativas (Kimray o eléctricas).
-          2. *Causa:* Pérdida de eficiencia en el reboiler por ensuciamiento o baja temperatura. *Acción:* Comprobar que el set-point del quemador se ubique por encima de los $195^\\circ\\text{C}$ sin violar el límite de degradación de $204^\\circ\\text{C}$.
-          3. *Causa:* Fenómeno de espumado en desarrollo. *Acción:* Monitorear la $\Delta P$ de la torre contactora. Si registra valores superiores a los de régimen nominal, inyectar dosificador antiespumante (tipo siliconado) a través del lazo de succión de la bomba.
+        * **Fenómeno de Espumado (Foaming):** Causado por el ingreso de hidrocarburos líquidos pesados, condensados o químicos de pozo que alteran la tensión interfacial del solvente. Eleva bruscamente la $\\Delta P$ de la torre y genera un masivo arrastre por cabeza. *Acción operativa:* Inyectar dosificador antiespumante siliconado a la succión.
+        * **Falla de Bomba Kimray:** Las impurezas mecánicas o la obstrucción en los filtros de partículas de la succión traban las agujas y sellos internos del bloque piloto de las bombas Kimray (accionadas por el propio glicol rico), deteniendo el ciclo hidráulico por completo.
         """)
 
     # =========================================================================
     # MÓDULO IV: CRIOGENIA AVANZADA Y TURBOEXPANSIÓN
     # =========================================================================
     elif "Módulo IV" in capitulo:
-        st.subheader("4.1 Balance de Energía en Sistemas de Expansión Trabajo-Eje")
+        st.subheader("4.1 Balances Térmicos y Expansión Isentrópica")
         st.write("""
-        En las plantas criogénicas de extracción del Complejo Cerri, la turboexpansión representa el núcleo del proceso de fraccionamiento profundo. El balance de energía bajo flujo estacionario para el expansor operando de manera adiabática reversible (isentrópica) se modela mediante el salto de entalpía real:
+        La turboexpansión representa el núcleo del proceso de extracción profunda de Líquidos del Gas Natural (LGN). A diferencia de una válvula Joule-Thomson (JT), que realiza una expansión isentálpica irreversible (sin extracción de trabajo), el turboexpansor ejecuta una **expansión isentrópica con extracción de trabajo útil**. El balance de energía bajo flujo estacionario responde a:
         """)
         st.latex(r"\Delta H_{real} = \eta_{isentropica} \cdot (H_{entrada} - H_{salida, ideal})")
         st.write("""
-        El trabajo mecánico extraído es transmitido rígiramente por un eje común hacia el compresor de carga (booster), el cual realiza una pre-compresión del gas residual de la torre demetinizadora, optimizando la eficiencia térmica global del sistema.
+        Si el operador reduce la eficiencia isentrópica cerrando parcialmente los álabes (toberas de entrada), se genera entropía y el gas retiene calor latente, haciendo que la temperatura resultante sea más alta de lo planificado y limitando drásticamente la recuperación de propano y butano.
+        
+        **Requisitos Críticos del Gas de Entrada:**
+        * **Límite Extremo de Humedad:** El gas debe ser deshidratado en camas fijas de **Tamices Moleculares (Zeolita 4A)** hasta valores menores a **1 ppm de agua** (Punto de rocío $< -100^\\circ\\text{C}$). Una planta de TEG convencional solo llega a $\\sim 64\\text{ mg/m}^3$ ($-15^\\circ\\text{C}$), lo que causaría el bloqueo total por hielo de los canales del intercambiador compacto.
+        * **Especificación de CO2:** La concentración de CO2 molar debe ser estrictamente regulada ($< 0.5\\%-1.0\\%$). A temperaturas criogénicas inferiores a $-60^\\circ\\text{C}$, el CO2 supera su límite de solubilidad y **sublima formando hielo seco**, taponando los canales del **Cold Box**.
+        * **Hidrocarburos Pesados ($C_6+$):** Su presencia en el gas genera la solidificación y formación de geles cerosos a temperaturas frías, inhabilitando las mallas coalescedoras de los separadores criogénicos.
+        
+        **Intercambiadores Cold Box y Booster:** Se emplean bloques compactos de aluminio soldado por su masiva densidad de área de transferencia y aproximaciones térmicas estrechas ($< 2^\\circ\\text{C}$). El trabajo del eje se acopla rígidamente a un compresor **Booster** que pre-comprime el gas residual saliente de la Demetinizadora, optimizando la eficiencia de la planta.
         """)
         
         st.markdown("#### 📈 Simulador de Caída de Temperatura Criogénica")
         eff_exp = st.slider("Eficiencia Isentrópica del Turboexpansor (%):", 65, 95, 85)
-        
         p_in = 6000.0  
         p_out = np.linspace(1500, 4000, 50)
         t_out = 20.0 - (((p_in - p_out) / p_in) * 120.0 * (eff_exp / 100.0))
         
-        # Conversión explícita a flotantes nativos para evitar ValueErrors en gráficos
         x_p_out = [float(p) for p in p_out]
         y_t_out = [float(t) for t in t_out]
         temp_critica = float(getattr(cfg, "TEMP_CRITICA_TURBOEXP", -100.0))
@@ -182,31 +189,32 @@ def render_manual():
     # MÓDULO V: DINÁMICA DE LA COMPRESIÓN Y REDES DE TRANSPORTE
     # =========================================================================
     elif "Módulo V" in capitulo:
-        st.subheader("5.1 Fenómeno de Surge (Bombeo) en Compresores Centrífugos")
+        st.subheader("5.1 Fenómenos de Inestabilidad Aerodinámica: Surge y Choke")
         st.write("""
-        El **Surge o Bombeo** es la inestabilidad aerodinámica más destructiva que puede sufrir un compresor centrífugo de gas. Ocurre cuando el caudal volumétrico de entrada cae por debajo de un valor crítico para una velocidad de rotación determinada, provocando que la contrapresión del gasoducto venza la fuerza de empuje de los álabes del rodete.
+        Las turbocompresoras instaladas en las redes de transporte están sujetas a límites hidrodinámicos estrictos descritos en sus mapas de performance:
         
-        El flujo de gas se invierte instantáneamente, circulando en sentido retrógrado (desde la descarga hacia la succión). Esto genera fluctuaciones violentas de presión, vibraciones axiales extremas, sobrecalentamiento de cojinetes y la destrucción mecánica total de los sellos de gas seco y álabes en cuestión de segundos.
-        """)
+        * **Fenómeno de Surge (Bombeo):** Ocurre si el punto operativo cruza a la izquierda de la **Línea de Límite de Surge (SLL)** por falta de caudal volumétrico. La contrapresión del gasoducto vence el empuje de los álabes del rodete y el flujo de gas se invierte instantáneamente circulando de forma retrógrada. Esto produce fluctuaciones violentas y oscilaciones cíclicas que inducen un severo **desplazamiento microscópico del eje (vibración axial)**, destruyendo los cojinetes de empuje (*Tilting Pad Bearings*) y los sellos de gas seco en segundos.
+        * **Fenómeno de Choke (Stone Wall):** Representa el punto de caudal máximo admisible a la derecha de la curva, donde la velocidad del gas en el ojo del impulsor alcanza la velocidad del sonido (**Mach 1**), provocando ondas de choque internas y la caída vertical de la eficiencia.
         
-        st.subheader("5.2 Filosofía del Lazo Anti-Surge y Válvula de Reciclo")
-        st.write("""
-        Para mitigar este riesgo, las estaciones compresoras cuentan con una línea de reciclo rápido equipada con una válvula de control de apertura ultrarrápida ($ASV$). El controlador anti-surge mide continuamente el caudal y la relación de presiones, manteniendo el punto de operación a la derecha de la **Línea de Límite de Surge (SLL)** mediante la apertura preventiva de la válvula para reinyectar gas de la descarga hacia la succión.
+        **Filosofía de Control e Instrumentación de Soporte:**
+        * **Lazo Anti-Surge:** Regula la apertura automatizada y ultrarrápida de la Válvula de Reciclo Rápido ($ASV$) para reinyectar gas de la descarga caliente (previa refrigeración) hacia la succión, forzando un aumento del caudal real por encima del límite crítico.
+        * **Separador de Succión (Scrubber):** Equipo mandatorio instalado aguas arriba de la succión. Elimina cualquier bache o traza de líquido libre. Al ser los líquidos fluidos incompresibles, el impacto de una gota contra un impulsor girando a miles de RPM causa erosión inmediata y la destrucción mecánica total del rodete por desbalance dinámico.
+        * **Sellos de Gas Seco (Dry Gas Seals):** Actúan como barreras de contención entre el eje rotante y la carcasa presurada utilizando gas de proceso ultrafiltrado de alta pureza. Operan por ranuras dinámicas sin contacto físico, evitando fugas de hidrocarburos a la atmósfera o contaminación con el aceite de lubricación.
+        * **Aeroenfriadores Interetapa (Intercoolers):** El proceso de compresión eleva fuertemente la temperatura por trabajo termodinámico. El enfriamiento interetapa reduce el volumen específico del gas, minimizando la potencia requerida para la siguiente etapa de compresión en serie y resguardando los límites mecánicos de los materiales.
         """)
 
     # =========================================================================
     # MÓDULO VI: FILOSOFÍA DE PROTECCIONES Y NORMA NAG-125
     # =========================================================================
     elif "Módulo VI" in capitulo:
-        st.subheader("6.1 Arquitectura del Sistema Instrumentado de Seguridad (SIS)")
+        st.subheader("6.1 Arquitectura SIS y Filosofía de Diseño Fail-Safe")
         st.write("""
-        De acuerdo con las exigencias legales dictaminadas por la norma **NAG-125**, las funciones instrumentadas de seguridad deben estar lógicamente desacopladas del Sistema de Control de Procesos Distribuido ($DCS$). Esto garantiza que ante una falla general de las pantallas de control o del procesador central, el PLC de seguridad (certificado bajo normas internacionales *SIL 2* o *SIL 3*) actúe de manera autónoma.
+        Bajo las exigencias dictaminadas por la norma nacional **NAG-125**, los esquemas de protección automatizada de planta deben responder a directrices internacionales de alta disponibilidad:
         
-        **Lógica del Desenergizar para Disparar (Fail-Safe):** Todos los lazos de las válvulas de cierre de emergencia de planta ($SDV$) operan bajo el principio de seguridad inherente: si el sistema pierde alimentación eléctrica o presión de aire de instrumentos, los actuadores de resorte forzarán inmediatamente el cierre estanco de las válvulas para aislar la planta.
-        """)
+        * **Independencia de Sistemas:** El **Sistema Instrumentado de Seguridad (SIS)** debe estar lógica y físicamente desacoplado del Sistema de Control de Procesos Distribuido ($DCS$). Utiliza hardware dedicado y certificado (PLC de Seguridad con niveles de confianza *SIL 2* o *SIL 3*) asegurando que los lazos de parada actúen de manera autónoma e infalible aunque falle el control diario de pantallas en la sala de operaciones.
+        * **Lógica del Desenergizar para Disparar (Fail-Safe):** Todos los lazos operan bajo el principio de seguridad inherente. Si hay pérdida total de energía eléctrica o aire de instrumentos en la planta, los actuadores de resorte mecánico forzarán de inmediato el posicionamiento seguro de los activos: las **Válvulas de Bloqueo de Frontera ($SDV$)** cerrarán herméticamente (*Fail-Close*) para confinar áreas operativas, mientras que las **Válvulas de Despresurización ($BDV$)** abrirán por completo (*Fail-Open*) para aliviar y derivar los inventarios de gas retenidos hacia la antorcha en menos de 5 minutos.
+        * **Lógica de Votación Coincidente (2oo3):** Los instrumentos de variables críticas de proceso (como transmisores de presión o nivel) se instalan por triplicado. El PLC de seguridad ejecutará el disparo de emergencia solo si al menos dos de los tres sensores independientes validan de forma simultánea la condición de alarma, equilibrando la mitigación de riesgos con la prevención de paradas espurias.
+        * **Pruebas de Recorrido Parcial (Partial Stroke Testing - PST):** Práctica que permite mover una válvula de corte crítico ($SDV$) una fracción pequeña de su carrera (ej. 10%-15%) durante la operación normal de planta. Esto verifica que el actuador y el vástago no estén bloqueados o agarrotados mecánicamente, incrementando la disponibilidad del lazo sin interrumpir la producción de gas.
         
-        st.subheader("6.2 Protocolos de Emergencia Operativa (ESD) ante Incidentes de Proceso")
-        st.write("""
-        * **Nivel Operacional de Parada 1 (ESD Total de Planta):** Bloqueo total de fronteras mediante el cierre inmediato de las $SDV$ de entrada de yacimientos y de despacho a gasoductos troncales. Desconexión instantánea de todas las unidades de compresión y apertura manual o automática de las $BDV$ (Blowdown valves) para despresurizar el inventario de gas retenido hacia la antorcha de forma segura en menos de 5 minutos.
-        * **Nivel Operacional de Parada 2 (Aislamiento de Unidad):** Parada localizada de un compresor o tren térmico sin necesidad de despresurizar o aislar los módulos remotos de la planta.
+        **Protocolo de Parada de Emergencia Nivel 1 (ESD Nivel 1):** Es la máxima acción de resguardo operativo ante catástrofes. Involucra el bloqueo automático y estanco de las fronteras de ingreso de yacimientos, parada instantánea de todas las unidades de compresión y trenes de proceso, seguido de la apertura masiva de las $BDV$ para vaciar de forma segura y controlada la energía acumulada en las instalaciones de la planta.
         """)
