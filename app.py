@@ -24,20 +24,22 @@ seccion = st.sidebar.radio("Seleccione el Módulo de Trabajo:", [
     "Tratamiento (TEG)",
     "Planta Criogénica",
     "Compresión y Gasoductos",
+    "Fraccionamiento de Líquidos",
     "Calidad y Medición",
     "Matriz de Seguridad (NAG-125)",
+    "Servicios Auxiliares",
+    "--------------------------------", # Separador visual en el menú
     "1. Manual Técnico Digital",
-    "2. Sistema de Evaluación",
-    "3. Entrenamiento Normativo",
-    "4. Entrenamiento Cognitivo",
-    "Fraccionamiento de Líquidos",
-    "Servicios Auxiliares"
+    "2. Guías Rápidas de Campo",      # <-- NUEVO: Módulo independiente de fichas dinámicas
+    "3. Sistema de Evaluación",
+    "4. Entrenamiento Normativo",
+    "5. Entrenamiento Cognitivo"
 ])
 
 st.sidebar.markdown("---")
 st.sidebar.info("📌 **Control de Gestión:** Simulador configurado bajo normas de transporte y seguridad industrial.")
 
-# --- IMPORTACIÓN EN TIEMPO DE EJECUCIÓN (Previene errores de dependencias cruzadas) ---
+# --- ENRUTAMIENTO Y IMPORTACIÓN EN TIEMPO DE EJECUCIÓN ---
 if seccion == "Panel Control General":
     st.subheader("📊 Resumen Operativo de la Planta")
     col1, col2, col3, col4 = st.columns(4)
@@ -67,6 +69,10 @@ elif seccion == "Compresión y Gasoductos":
     from modulos.transporte import render_transporte
     st.session_state.p_descarga_gasoducto = render_transporte()
 
+elif seccion == "Fraccionamiento de Líquidos":
+    from modulos.fraccionamiento_lgn import render_fraccionamiento
+    render_fraccionamiento()
+
 elif seccion == "Calidad y Medición":
     from modulos.calidad_medicion import render_calidad_medicion
     render_calidad_medicion()
@@ -75,27 +81,30 @@ elif seccion == "Matriz de Seguridad (NAG-125)":
     from modulos.seguridad import render_seguridad
     render_seguridad()
 
-elif seccion == "1. Manual Técnico Digital":
-    from modulos.manual_digital import render_manual
-    render_manual()
-
-elif seccion == "2. Sistema de Evaluación":
-    from modulos.evaluacion import render_evaluacion
-    render_evaluacion()
-
-elif seccion == "3. Entrenamiento Normativo":
-    from modulos.normativo import render_normativo
-    render_normativo()
-
-# CORRECCIÓN: Se cambió "Entertainmento" por "Entrenamiento" para que coincida exactamente con el radio button
-elif seccion == "4. Entrenamiento Cognitivo":
-    from modulos.cognitivo import render_cognitivo
-    render_cognitivo()
-elif seccion == "Fraccionamiento de Líquidos":
-    from modulos.fraccionamiento_lgn import render_fraccionamiento
-    render_fraccionamiento()
 elif seccion == "Servicios Auxiliares":
     from modulos.servicios_auxiliares import render_servicios
     render_servicios()
 
+elif seccion == "1. Manual Técnico Digital":
+    from modulos.manual_digital import render_manual
+    render_manual()
 
+elif seccion == "2. Guías Rápidas de Campo":
+    # <-- NUEVO: Llamada al módulo visual fácil de interpretar
+    from modulos.guias_rapidas import render_guias_rapidas
+    render_guias_rapidas()
+
+elif seccion == "3. Sistema de Evaluación":
+    from modulos.evaluacion import render_evaluacion
+    render_evaluacion()
+
+elif seccion == "4. Entrenamiento Normativo":
+    from modulos.normativo import render_normativo
+    render_normativo()
+
+elif seccion == "5. Entrenamiento Cognitivo":
+    from modulos.cognitivo import render_cognitivo
+    render_cognitivo()
+
+elif seccion == "--------------------------------":
+    st.warning("👈 Por favor, seleccione una sección operativa válida del menú lateral.")
