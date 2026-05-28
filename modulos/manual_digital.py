@@ -41,13 +41,24 @@ def render_manual():
         st.caption("Simulación del comportamiento de la desviación del gas ideal según la presión operativa a temperatura de colector.")
         
         p_rango = np.linspace(100, 10000, 100) # kPa
-        # Simulación de curva real de Z para gas natural (metano dominante)
         z_rango = 1.0 - (p_rango * 0.00004) + (p_rango**2 * 2.5e-9)
         
+        # Sanitización de datos para Plotly
+        x_p = [float(p) for p in p_rango]
+        y_z = [float(z) for z in z_rango]
+        y_ideal = [1.0] * len(x_p)
+        
         fig_z = go.Figure()
-        fig_z.add_trace(go.Scatter(x=p_rango, y=z_rango, mode='lines', name='Gas Real (Predicción PR)', line=dict(color='#00CC96', width=3)))
-        fig_z.add_trace(go.Scatter(x=p_rango, y=[1.0]*100, mode='lines', name='Gas Ideal (Z=1)', line=dict(color='white', dash='dash')))
-        fig_z.update_layout(title="Desviación de Compresibilidad (Factor Z) vs Presión", xaxis_title="Presión Operativa (kPa)", yaxis_title="Factor Z", template="plotly_dark", height=300)
+        fig_z.add_trace(go.Scatter(x=x_p, y=y_z, mode='lines', name='Gas Real (Predicción PR)', line=dict(color='#00CC96', width=3)))
+        fig_z.add_trace(go.Scatter(x=x_p, y=y_ideal, mode='lines', name='Gas Ideal (Z=1)', line=dict(color='white', dash='dash')))
+        fig_z.update_layout(
+            title="Desviación de Compresibilidad (Factor Z) vs Presión", 
+            xaxis_title="Presión Operativa (kPa)", 
+            yaxis_title="Factor Z", 
+            template="plotly_dark", 
+            height=300,
+            margin=dict(l=20, r=20, t=40, b=20)
+        )
         st.plotly_chart(fig_z, use_container_width=True)
         
         st.subheader("1.2 Mecanismo de Formación y Disociación de Hidratos")
@@ -73,15 +84,19 @@ def render_manual():
         **Tiempo de Residencia:** El volumen de líquidos debe dimensionarse para retener el bache el tiempo suficiente para que las burbujas de gas atrapadas en el líquido migren hacia arriba (*Carry-under*), típicamente entre 5 y 10 minutos.
         """)
         
-        # Gráfica interactiva de código: Velocidad Máxima Permitida vs Presión
         st.markdown("#### 📈 Gráfica de Control: Velocidad Crítica de Souders-Brown")
         pressures = np.linspace(1000, 7000, 50)
-        rho_g = pressures / (8.314 * 293) * 16  # Densidad aproximada del gas
-        rho_l = 750.0  # Densidad del condensado kg/m3
-        k_factor = 0.11  # m/s constante típica
+        rho_g = pressures / (8.314 * 293) * 16  
+        rho_l = 750.0  
+        k_factor = 0.11  
         v_critica = k_factor * np.sqrt((rho_l - rho_g) / rho_g)
         
-        df_v = pd.DataFrame({"Velocidad Límite del Gas (m/s)": v_critica}, index=pressures)
+        # DataFrame limpio y estructurado para Streamlit nativo
+        df_v = pd.DataFrame({
+            "Presión Colector (kPa)": pressures,
+            "Velocidad Límite del Gas (m/s)": v_critica
+        }).set_index("Presión Colector (kPa)")
+        
         st.line_chart(df_v)
         st.caption("A mayor presión de operación, la densidad del gas aumenta, disminuyendo la velocidad límite permitida dentro del separador para evitar el arrastre.")
 
@@ -104,14 +119,17 @@ def render_manual():
         La eficiencia de remoción de agua es directamente proporcional a la tasa de circulación del glicol pobre (típicamente de **1.5 a 3.0 galones de TEG por cada libra de agua a remover**) y a la pureza del glicol regenerado.
         """)
         
-        # Gráfica interactiva: Renta de Circulación vs Humedad de Salida
         st.markdown("#### 📈 Simulador de Sensibilidad: Tasa de Inyección de TEG")
         tasa_circ = st.slider("Tasa de Inyección de TEG (Galones/lb H2O):", 1.0, 4.0, 2.0, step=0.5)
         
         h_salida_sim = 120.0 / (tasa_circ * 1.8)
+        
+        # Protección ante configuraciones faltantes en config.py
+        limite_h = getattr(cfg, "LIMITE_HUMEDAD", 64.0)
+        
         st.metric("Humedad Estimada de Salida", f"{h_salida_sim:.1f} mg/m³", 
-                  delta="DENTRO DE NORMA" if h_salida_sim <= cfg.LIMITE_HUMEDAD else "FUERA DE ESPECIFICACIÓN",
-                  delta_color="normal" if h_salida_sim <= cfg.LIMITE_HUMEDAD else "inverse")
+                  delta="DENTRO DE NORMA" if h_salida_sim <= limite_h else "FUERA DE ESPECIFICACIÓN",
+                  delta_color="normal" if h_salida_sim <= limite_h else "inverse")
 
         st.subheader("3.2 Guía de Resolución de Fallas Críticas (Troubleshooting)")
         st.write("""
@@ -131,22 +149,33 @@ def render_manual():
         """)
         st.latex(r"\Delta H_{real} = \eta_{isentropica} \cdot (H_{entrada} - H_{salida, ideal})")
         st.write("""
-        El trabajo mecánico extraído es transmitido rígidamente por un eje común hacia el compresor de carga (booster), el cual realiza una pre-compresión del gas residual de la torre demetinizadora, optimizando la eficiencia térmica global del sistema.
+        El trabajo mecánico extraído es transmitido rígiramente por un eje común hacia el compresor de carga (booster), el cual realiza una pre-compresión del gas residual de la torre demetinizadora, optimizando la eficiencia térmica global del sistema.
         """)
         
-        # Gráfica interactiva de código: Perfil de Temperatura de Expansión
         st.markdown("#### 📈 Simulador de Caída de Temperatura Criogénica")
         eff_exp = st.slider("Eficiencia Isentrópica del Turboexpansor (%):", 65, 95, 85)
         
-        p_in = 6000.0  # kPa
+        p_in = 6000.0  
         p_out = np.linspace(1500, 4000, 50)
-        # Caída térmica simulada basada en caída de presión y eficiencia
         t_out = 20.0 - (((p_in - p_out) / p_in) * 120.0 * (eff_exp / 100.0))
         
+        # Conversión explícita a flotantes nativos para evitar ValueErrors en gráficos
+        x_p_out = [float(p) for p in p_out]
+        y_t_out = [float(t) for t in t_out]
+        temp_critica = float(getattr(cfg, "TEMP_CRITICA_TURBOEXP", -100.0))
+        y_limite = [temp_critica] * len(x_p_out)
+        
         fig_criog = go.Figure()
-        fig_criog.add_trace(go.Scatter(x=p_out, y=t_out, mode='lines', name='Temperatura Demetinizadora', line=dict(color='#1f77b4', width=3)))
-        fig_criog.add_trace(go.Scatter(x=[1500, 4000], y=[cfg.TEMP_CRITICA_TURBOEXP]*2, mode='lines', name='Límite de Diseño de Materiales', line=dict(color='red', dash='dash')))
-        fig_criog.update_layout(title="Temperatura Resultante vs Presión de Salida", xaxis_title="Presión de Salida de Expansor (kPa)", yaxis_title="Temperatura (°C)", template="plotly_dark", height=300)
+        fig_criog.add_trace(go.Scatter(x=x_p_out, y=y_t_out, mode='lines', name='Temperatura Demetinizadora', line=dict(color='#1f77b4', width=3)))
+        fig_criog.add_trace(go.Scatter(x=x_p_out, y=y_limite, mode='lines', name='Límite de Diseño de Materiales', line=dict(color='red', dash='dash')))
+        fig_criog.update_layout(
+            title="Temperatura Resultante vs Presión de Salida", 
+            xaxis_title="Presión de Salida de Expansor (kPa)", 
+            yaxis_title="Temperatura (°C)", 
+            template="plotly_dark", 
+            height=300,
+            margin=dict(l=20, r=20, t=40, b=20)
+        )
         st.plotly_chart(fig_criog, use_container_width=True)
 
     # =========================================================================
