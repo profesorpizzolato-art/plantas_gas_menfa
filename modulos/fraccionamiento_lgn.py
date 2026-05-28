@@ -48,11 +48,12 @@ def render_fraccionamiento():
                 title="Perfil de Concentración Molar por Plato",
                 xaxis_title="Fracción Molar en Fase Líquida (x)",
                 yaxis_title="Número de Plato (Fondo a Tope)",
-                yaxis=dict(autorange="reverse"),
                 template="plotly_dark",
                 height=320,
                 margin=dict(l=20, r=20, t=40, b=20)
             )
+            # SOLUCCIÓN AL VALUEERROR: Inversión del eje de manera explícita y segura
+            fig_deet.update_yaxes(autorange="reverse")
             st.plotly_chart(fig_deet, use_container_width=True)
             
         # Indicadores de calidad comerciales
@@ -104,11 +105,12 @@ def render_fraccionamiento():
                 title="Perfil de Concentración Molar por Plato",
                 xaxis_title="Fracción Molar en Fase Líquida (x)",
                 yaxis_title="Número de Plato (Fondo a Tope)",
-                yaxis=dict(autorange="reverse"),
                 template="plotly_dark",
                 height=320,
                 margin=dict(l=20, r=20, t=40, b=20)
             )
+            # SOLUCCIÓN AL VALUEERROR: Inversión del eje de manera explícita y segura
+            fig_deprop.update_yaxes(autorange="reverse")
             st.plotly_chart(fig_deprop, use_container_width=True)
             
         pureza_c3_tope = c3_profile[0] * 100
