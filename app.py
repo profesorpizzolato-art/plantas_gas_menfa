@@ -30,7 +30,8 @@ seccion = st.sidebar.radio("Seleccione el Módulo de Trabajo:", [
     "2. Sistema de Evaluación",
     "3. Entrenamiento Normativo",
     "4. Entrenamiento Cognitivo",
-    "Fraccionamiento de Líquidos"
+    "Fraccionamiento de Líquidos",
+    "Servicios Auxiliares"
 ])
 
 st.sidebar.markdown("---")
@@ -93,4 +94,8 @@ elif seccion == "4. Entrenamiento Cognitivo":
 elif seccion == "Fraccionamiento de Líquidos":
     from modulos.fraccionamiento_lgn import render_fraccionamiento
     render_fraccionamiento()
-    
+elif seccion == "Servicios Auxiliares":
+    from modulos.servicios_auxiliares import render_servicios
+    render_servicios()
+
+
