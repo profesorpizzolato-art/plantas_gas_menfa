@@ -33,32 +33,36 @@ def render_fraccionamiento():
             
             # Modelo matemático simplificado de perfil de platos (20 platos)
             platos = np.arange(1, 21)
-            # Simulación de curvas de fracción molar según variables
             factor_separacion = (t_reb_deet / 95.0) * (r_ratio_deet / 2.1) / (p_deet / 2200.0)
             
             c2_profile = 1.0 / (1.0 + np.exp((platos - 10) * 0.4 * factor_separacion))
             c3_profile = 1.0 - c2_profile
             
+            # Conversión explícita a datos nativos para evitar conflictos de tipos
+            x_c2 = [float(x) for x in c2_profile]
+            x_c3 = [float(x) for x in c3_profile]
+            y_platos = [int(y) for y in platos]
+            
             # Gráfico de Plotly para el perfil de la torre
             fig_deet = go.Figure()
-            fig_deet.add_trace(go.Scatter(x=c2_profile, y=platos, mode='lines+markers', name='Etano (C2)', line=dict(color='#00CC96', width=3)))
-            fig_deet.add_trace(go.Scatter(x=c3_profile, y=platos, mode='lines+markers', name='Propano+ (C3+)', line=dict(color='#AB63FA', width=3)))
+            fig_deet.add_trace(go.Scatter(x=x_c2, y=y_platos, mode='lines+markers', name='Etano (C2)', line=dict(color='#00CC96', width=3)))
+            fig_deet.add_trace(go.Scatter(x=x_c3, y=y_platos, mode='lines+markers', name='Propano+ (C3+)', line=dict(color='#AB63FA', width=3)))
             
             fig_deet.update_layout(
                 title="Perfil de Concentración Molar por Plato",
                 xaxis_title="Fracción Molar en Fase Líquida (x)",
-                yaxis_title="Número de Plato (Fondo a Tope)",
+                yaxis_title="Número de Plato (Tope a Fondo)",
                 template="plotly_dark",
                 height=320,
-                margin=dict(l=20, r=20, t=40, b=20)
+                margin=dict(l=20, r=20, t=40, b=20),
+                # SOLUCIÓN AL VALUEERROR: Se define el rango invertido [20, 1] de forma numérica pura
+                yaxis=dict(range=[20, 1], tickmode='linear', dtick=2)
             )
-            # SOLUCCIÓN AL VALUEERROR: Inversión del eje de manera explícita y segura
-            fig_deet.update_yaxes(autorange="reverse")
             st.plotly_chart(fig_deet, use_container_width=True)
             
         # Indicadores de calidad comerciales
-        pureza_tope = c2_profile[0] * 100
-        contaminacion_fondo = (1.0 - c3_profile[-1]) * 100
+        pureza_tope = x_c2[0] * 100
+        contaminacion_fondo = (1.0 - x_c3[-1]) * 100
         
         st.markdown("#### 🔍 Análisis de Producto de Salida")
         c_col1, c_col2 = st.columns(2)
@@ -91,30 +95,35 @@ def render_fraccionamiento():
             st.markdown("### 📊 Perfil de Composición y Eficiencia")
             
             # Modelo matemático para depropanizadora (24 platos)
-            platos_dep = np.arange(1, 25)
+            platos_dep = np.arange(1, 24)
             factor_sep_dep = (t_reb_deprop / 130.0) * (r_ratio_deprop / 2.5) / (p_deprop / 1700.0)
             
             c3_profile = 1.0 / (1.0 + np.exp((platos_dep - 12) * 0.35 * factor_sep_dep))
             c4_profile = 1.0 - c3_profile
             
+            # Conversión explícita a datos nativos
+            x_c3 = [float(x) for x in c3_profile]
+            x_c4 = [float(x) for x in c4_profile]
+            y_platos_dep = [int(y) for y in platos_dep]
+            
             fig_deprop = go.Figure()
-            fig_deprop.add_trace(go.Scatter(x=c3_profile, y=platos_dep, mode='lines+markers', name='Propano (C3)', line=dict(color='#FFA15A', width=3)))
-            fig_deprop.add_trace(go.Scatter(x=c4_profile, y=platos_dep, mode='lines+markers', name='Butano+ (C4+)', line=dict(color='#19D3F3', width=3)))
+            fig_deprop.add_trace(go.Scatter(x=x_c3, y=y_platos_dep, mode='lines+markers', name='Propano (C3)', line=dict(color='#FFA15A', width=3)))
+            fig_deprop.add_trace(go.Scatter(x=x_c4, y=y_platos_dep, mode='lines+markers', name='Butano+ (C4+)', line=dict(color='#19D3F3', width=3)))
             
             fig_deprop.update_layout(
                 title="Perfil de Concentración Molar por Plato",
                 xaxis_title="Fracción Molar en Fase Líquida (x)",
-                yaxis_title="Número de Plato (Fondo a Tope)",
+                yaxis_title="Número de Plato (Tope a Fondo)",
                 template="plotly_dark",
                 height=320,
-                margin=dict(l=20, r=20, t=40, b=20)
+                margin=dict(l=20, r=20, t=40, b=20),
+                # SOLUCIÓN AL VALUEERROR: Se define el rango invertido [23, 1] de forma numérica pura
+                yaxis=dict(range=[23, 1], tickmode='linear', dtick=2)
             )
-            # SOLUCCIÓN AL VALUEERROR: Inversión del eje de manera explícita y segura
-            fig_deprop.update_yaxes(autorange="reverse")
             st.plotly_chart(fig_deprop, use_container_width=True)
             
-        pureza_c3_tope = c3_profile[0] * 100
-        contaminacion_c3_fondo = (1.0 - c4_profile[-1]) * 100
+        pureza_c3_tope = x_c3[0] * 100
+        contaminacion_c3_fondo = (1.0 - x_c4[-1]) * 100
         
         st.markdown("#### 🔍 Análisis de Producto Comercial")
         c_col3, c_col4 = st.columns(2)
