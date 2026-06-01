@@ -27,7 +27,10 @@ try:
     from modulos.procesamiento import render_procesamiento
     from modulos.calidad_medicion import render_calidad_medicion
     from modulos.servicios_auxiliares import render_servicios
-    from modulos.manual_digital import render_manual_digital  # <- Movido a su módulo propio
+    
+    # IMPORTANTE: Importamos 'render_manual' y le asignamos el alias que espera el enrutador
+    from modulos.manual_digital import render_manual as render_manual_digital  
+    
     from modulos.guias_rapidas import render_guias_rapidas
     from modulos.evaluacion import render_evaluacion
     from modulos.normativo import render_normativo        # <- Conexión real al módulo normativo
