@@ -1,87 +1,78 @@
 # modulos/evaluacion.py
 import streamlit as st
-# Importamos de forma directa las 40 preguntas sanitizadas
-from modulos.banco_preguntas import BANCO_40_PREGUNTAS
 
 def render_evaluacion():
-    st.header("📝 Pilar 2: Sistema de Evaluación de Competencia")
-    st.caption("Cuestionario formal obligatorio de operaciones de planta y control de procesos (40 Preguntas - Mínimo aprobación: 70%).")
+    st.header("📝 Sistema Integrado de Evaluación Técnica Operativa")
+    st.caption("Consola automatizada para auditar las maniobras del operador y validar competencias regulatorias.")
     st.markdown("---")
-    
-    # Estructura para almacenar las opciones elegidas por el operario
-    respuestas_usuario = {}
-    
-    # Desplegar los reactivos organizados en acordeones por Módulo Técnico para una lectura cómoda
-    modulos_disponibles = ["Módulo I", "Módulo II", "Módulo III", "Módulo IV", "Módulo V", "Módulo VI"]
-    titulos_modulos = {
-        "Módulo I": "🌋 Módulo I: Termodinámica e Hidratos de Gas",
-        "Módulo II": "💧 Módulo II: Hidráulica de Separación de Entrada y Slugs",
-        "Módulo III": "🗼 Módulo III: Deshidratación por Glicol (TEG)",
-        "Módulo IV": "❄️ Módulo IV: Plantas Criogénicas y Turboexpansión",
-        "Módulo V": "🌀 Módulo V: Dinámica de la Compresión Centrífuga",
-        "Módulo VI": "🛡️ Módulo VI: Filosofía de Protecciones SIS y Norma NAG-125"
-    }
-    
-    st.info("💡 **Indicación para el Alumno:** Expanda cada bloque técnico y complete las opciones. Al finalizar todos los módulos, presione el botón inferior para procesar su calificación.")
-    
-    # Ciclo inteligente para renderizar las preguntas ordenadas por su pilar de ingeniería
-    for m in modulos_disponibles:
-        with st.expander(titulos_modulos[m], expanded=False):
-            preguntas_del_modulo = [p for p in BANCO_40_PREGUNTAS if p["modulo"] == m]
-            
-            for item in preguntas_del_modulo:
-                respuestas_usuario[item["id"]] = st.radio(
-                    item["pregunta"],
-                    options=item["opciones"],
-                    index=None,
-                    key=f"q_40_{item['id']}"
-                )
-                st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True) # Separador visual fino
-                
+
+    # --- DATOS DEL POSTULANTE / ALUMNO ---
+    col_d1, col_d2 = st.columns(2)
+    with col_d1:
+        nombre_alumno = st.text_input("Nombre y Apellido del Operador:", placeholder="Ej: Juan Pérez")
+    with col_d2:
+        dni_alumno = st.text_input("DNI / Registro Legajo Técnico:", placeholder="Ej: 38444555")
+
+    if not nombre_alumno or not dni_alumno:
+        st.info("💡 **Acceso Protegido:** Ingrese su Nombre y DNI para procesar la auditoría de la planta en tiempo real.")
+        return
+
     st.markdown("---")
+    st.subheader(f"🔍 Auditoría en Vivo - Planta Operada por: {nombre_alumno}")
+
+    # --- AUDITORÍA DE CRITERIOS DE INGENIERÍA EN SEGUNDO PLANO ---
+    puntos = 100
+    errores = []
+
+    # 1. Validación Separador de Entrada (El Pozo Ilustrado / Instrumentation)
+    nivel_sep = st.session_state.get('nivel_liquido', 45.0)
+    if nivel_sep > 80.0:
+        puntos -= 30
+        errores.append("❌ Permitió la inundación del Separador de Entrada V-101 (>80%). Causó Carry-over de crudo.")
+    elif nivel_sep < 15.0:
+        puntos -= 15
+        errores.append("❌ Nivel críticamente bajo en el Separador de Entrada (<15%). Riesgo de arrastre de gas (Gas Blowby).")
+
+    # 2. Validación de Deshidratación TEG (Dialnet)
+    humedad = st.session_state.get('humedad_salida', 24.5)
+    if humedad > 64.0:
+        puntos -= 30
+        errores.append("❌ Gas de salida fuera de especificación comercial (>64 mg/m³). Incumplimiento de Contrato de Despacho.")
+
+    # 3. Validación de Compresión (Plantas Compresoras)
+    # Reificamos si la planta sufrió un trip por vibración axial (Surge)
+    p_descarga = st.session_state.get('p_descarga_gasoducto', 6100.0)
+    p_entrada = st.session_state.get('p_entrada', 3500.0)
+    if p_descarga == p_entrada and p_entrada > 1000.0:
+        puntos -= 25
+        errores.append("❌ Provocó el TRIP por enclavamiento del Turbocompresor debido a vibración axial extrema (Fenómeno de Surge).")
+
+    # --- MOSTRAR RESULTADO DE LA EVALUACIÓN ---
+    col_res1, col_res2 = st.columns([1, 2])
     
-    # Procesamiento matemático de las respuestas
-    if st.button("📊 Enviar y Calificar Evaluación General", use_container_width=True):
-        # Validar si falta responder alguna de las 40 preguntas
-        if None in respuestas_usuario.values():
-            preguntas_sin_responder = [str(k) for k, v in respuestas_usuario.items() if v is None]
-            st.warning(f"⚠️ Evaluación incompleta. Por favor responda todas las consignas antes de enviar. Preguntas pendientes: {', '.join(preguntas_sin_responder)}")
+    with col_res1:
+        st.markdown("##### Nota Obtenida:")
+        if puntos >= 70:
+            st.success(f"### 🎉 {puntos} / 100")
+            st.balloons()
         else:
-            correctas = 0
-            total_preguntas = len(BANCO_40_PREGUNTAS)
+            st.error(f"### 📉 {puntos} / 100")
             
-            # Validación uno a uno contra el vector de respuestas correctas
-            for item in BANCO_40_PREGUNTAS:
-                if respuestas_usuario[item["id"]] == item["correcta"]:
-                    correctas += 1
+    with col_res2:
+        st.markdown("##### Dictamen Operativo:")
+        if puntos == 100:
+            st.markdown("🟢 **OPERADOR APTO - EXCELENCIA:** El sistema no detectó desvíos en ningún lazo de control. Operación Fail-Safe ideal.")
+        elif puntos >= 70:
+            st.markdown("🟡 **OPERADOR APTO CON OBSERVACIONES:** Mantiene la planta en línea, pero operó cerca de los límites críticos de alarma.")
+        else:
+            st.markdown("🔴 **OPERADOR NO APTO:** Se detectaron maniobras que comprometieron la integridad física de los equipos o la calidad del gas.")
+
+    # Listar fallas pedagógicas cometidas
+    if errores:
+        st.markdown("---")
+        st.markdown("##### ⚠️ Desvíos Técnicos Detectados por el Sistema:")
+        for err in errores:
+            st.write(err)
             
-            # Cálculo porcentual exacto
-            nota_final = int((correctas / total_preguntas) * 100)
-            
-            st.markdown("---")
-            st.subheader(f"📊 Resultados de la Evaluación Técnica")
-            
-            # Indicadores de rendimiento del alumno
-            col_res1, col_res2 = st.columns(2)
-            col_res1.metric("Puntaje Obtenido", f"{nota_final} %", delta="APROBADO" if nota_final >= 70 else "RECHAZO", delta_color="normal" if nota_final >= 70 else "inverse")
-            col_res2.metric("Respuestas Correctas", f"{correctas} / {total_preguntas}")
-            
-            if nota_final >= 70:
-                st.success(f"🎉 **COMPETENCIA VALIDADA.** El operario ha demostrado los conocimientos de ingeniería exigidos para el manejo seguro de los activos de la suite MENFA.")
-            else:
-                st.error("❌ **PROGRAMA DE REPASO REQUERIDO.** El puntaje no alcanza el estándar mínimo del 70%. Se solicita al alumno revisar los capítulos de detalle en el Manual Digital e intentarlo nuevamente.")
-                
-            # Panel pedagógico de retroalimentación en tiempo real
-            with st.expander("🔍 Auditoría Técnica: Revisar Justificación por Pregunta"):
-                for item in BANCO_40_PREGUNTAS:
-                    usr_ans = respuestas_usuario[item["id"]]
-                    es_correcta = usr_ans == item["correcta"]
-                    
-                    st.markdown(f"**Consigna {item['id']}** ({item['modulo']})")
-                    if es_correcta:
-                        st.markdown(f"↳ 🟢 *Respuesta del alumno:* {usr_ans} (Correcto)")
-                    else:
-                        st.markdown(f"↳ 🔴 *Respuesta del alumno:* {usr_ans}")
-                        st.markdown(f"↳ 🟢 *Línea correcta de proceso:* {item['correcta']}")
-                    st.caption(f"💡 *Sustento de Ingeniería:* {item['feedback']}")
-                    st.markdown("---")
+    st.markdown("---")
+    st.caption("Nota: Esta evaluación se actualiza dinámicamente. El alumno puede volver a los módulos, corregir la apertura de las válvulas o las marchas de los equipos, y su nota se recalculará automáticamente en vivo.")
