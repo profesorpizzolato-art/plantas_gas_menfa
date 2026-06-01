@@ -32,45 +32,36 @@ try:
 except ImportError as e:
     st.error(f"⚠️ Error de consistencia en arquitectura modular: {e}")
     st.stop()
-    # --- MENÚ LATERAL CON IDENTIDAD CORPORATIVA MENFA ---
-st.sidebar.image("logo_menfa.png", use_container_width=True)
-st.sidebar.title("🎛️ Matriz Operativa")
 
-# Diccionario para agrupar visualmente en el Selectbox
-opciones_menu = {
-    "🏭 MÓDULOS DE PROCESO Y PLANTA": [
+# --- MENÚ LATERAL CON IDENTIDAD CORPORATIVA MENFA ---
+st.sidebar.image("logo_menfa.png", use_container_width=True)
+
+st.sidebar.markdown("### 🏭 Operación de Planta")
+# Un solo radio unificado para evitar duplicidad de selección visual
+seccion = st.sidebar.radio(
+    label="Seleccione el Módulo Activo:",
+    options=[
         "Panel Control General",
         "Separación de Entrada",
         "Planta Criogénica y LGN",
         "Calidad y Medición (ENARGAS)",
-        "Servicios Auxiliares & IIoT"
-    ],
-    "📘 SOPORTE Y ENTRENAMIENTO ACADÉMICO": [
+        "Servicios Auxiliares & IIoT",
         "1. Manual Técnico Digital",
         "2. Guías Rápidas de Campo",      
         "3. Sistema de Evaluación",
         "4. Entrenamiento Normativo",
         "5. Entrenamiento Cognitivo"
-    ]
-}
+    ],
+    label_visibility="collapsed"
+)
 
-# Planificar la lista plana para el selectbox manteniendo los encabezados
-lista_desplegable = []
-for categoria, subitems in opciones_menu.items():
-    lista_desplegable.append(f"--- {categoria} ---")
-    lista_desplegable.extend(subitems)
-
-# Render del Selectbox único
-seleccion_cruda = st.sidebar.selectbox("Seleccione el Entorno de Trabajo:", lista_desplegable)
-
-# Lógica de bloqueo: si eligen un encabezado decorativo, por defecto va al Panel General
-if seleccion_cruda.startswith("---"):
-    seccion = "Panel Control General"
-else:
-    seccion = seleccion_cruda
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 📘 Soporte Académico")
+st.sidebar.caption("Acceda al material técnico de base, normativas de transporte y escenarios dinámicos avanzados.")
 
 st.sidebar.markdown("---")
 st.sidebar.info("📌 **Control de Gestión:** Suite MENFA parametrizada bajo normas de transporte y seguridad industrial argentina (ENARGAS).")
+
 # =====================================================================
 # --- RUTEO LOGÍSTICO Y DESPLIEGUE DE PESTAÑAS ---
 # =====================================================================
@@ -80,7 +71,6 @@ if seccion == "Panel Control General":
     st.caption("Resumen ejecutivo del estado de las variables de proceso y lazos cerrados de control de la planta.")
     st.markdown("---")
     
-    # Matriz de KPI en tiempo real
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Presión de Entrada (V-101)", f"{st.session_state['p_entrada']:.1f} kPa")
     col2.metric("Nivel Domo Líquidos", f"{st.session_state['nivel_liquido']:.1f} %")
@@ -113,7 +103,6 @@ elif seccion == "1. Manual Técnico Digital":
     st.caption("Documentación oficial de diseño, ecuaciones fundamentales de control y matrices de enclavamiento de la Suite MENFA.")
     st.markdown("---")
     
-    # Índice modularizado de alta densidad teórica
     m_tabs = st.tabs([
         "🛢️ Cap. 1: Separación Primaria", 
         "💧 Cap. 2: Absorción y Deshidratación", 
@@ -240,7 +229,7 @@ elif seccion == "1. Manual Técnico Digital":
             
             Al perderse el flujo mínimo, la contrapresión del gasoducto vence la fuerza del impulsor, provocando la **inversión violenta del flujo de gas** en dirección a la succión. Esto desata oscilaciones cíclicas extremas de presión, caídas bruscas de RPM y una **vibración axial severa** que destruye los laberintos, álabes y sellos de gas seco.
             
-            * **Válvula Anti-Surge (ASV):** Lazo de control automático instrumentado *Fail-Open*. Calcula en tiempo real la proximidad a la línea de bombeo y, ante un desvío, abre la ASV para reciclar gas caliente de la descarga hacia la succión, restituyendo de inmediato la masa en el rodete.
+            * **Válvula Anti-Surge (ASV):** Lazo de control automático instrumentado *Fail-Open*. Calculates en tiempo real la proximidad a la línea de bombeo y, ante un desvío, abre la ASV para reciclar gas caliente de la descarga hacia la succión, restituyendo de inmediato la masa en el rodete.
             """)
 
     # --- CAPÍTULO 5 ---
@@ -273,13 +262,13 @@ elif seccion == "1. Manual Técnico Digital":
         * **Estacionalidad de Demanda Invernal:** Ante el "Pico de Invierno", el despacho nacional prioriza de manera absoluta la inyección volumétrica bruta para el consumo prioritario domiciliario. Se penalizan severamente las paradas imprevistas y se flexibiliza marginalmente la extracción de licuables para favorecer el empuje de gas hacia los centros urbanos.
         """)
 
-# --- CONTINUACIÓN DEL BLOQUE PEDAGÓGICO ---
-
 elif seccion == "2. Guías Rápidas de Campo":
     render_guias_rapidas()
 
 elif seccion == "3. Sistema de Evaluación":
     render_evaluacion()
+
+# --- REHABILITACIÓN COMPLETA DE LOS ÚLTIMOS DOS BLOQUES PEDAGÓGICOS ---
 
 elif seccion == "4. Entrenamiento Normativo":
     st.title("📜 4. Entrenamiento Normativo & Regulatorio")
