@@ -17,7 +17,8 @@ if 'p_entrada' not in st.session_state:
     st.session_state.temp_reboiler = 182.0
 
 # --- MENÚ LATERAL DE NAVEGACIÓN ---
-st.sidebar.title("🎛️ Matriz Operativa")
+# Insertamos el logo corporativo de la suite en la parte superior del sidebar
+st.sidebar.image("logo_menfa.png", use_container_width=True)
 seccion = st.sidebar.radio("Seleccione el Módulo de Trabajo:", [
     "Panel Control General",
     "Separación de Entrada",
