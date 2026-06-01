@@ -32,45 +32,42 @@ try:
 except ImportError as e:
     st.error(f"⚠️ Error de consistencia en arquitectura modular: {e}")
     st.stop()
-
-# --- MENÚ LATERAL CON IDENTIDAD CORPORATIVA MENFA ---
+    # --- MENÚ LATERAL CON IDENTIDAD CORPORATIVA MENFA ---
 st.sidebar.image("logo_menfa.png", use_container_width=True)
+st.sidebar.title("🎛️ Matriz Operativa")
 
-st.sidebar.subheader("🎛️ Módulos de Operación")
-seccion_operativa = st.sidebar.radio(
-    "Seleccione Planta / Proceso:", 
-    [
+# Diccionario para agrupar visualmente en el Selectbox
+opciones_menu = {
+    "🏭 MÓDULOS DE PROCESO Y PLANTA": [
         "Panel Control General",
         "Separación de Entrada",
         "Planta Criogénica y LGN",
         "Calidad y Medición (ENARGAS)",
         "Servicios Auxiliares & IIoT"
     ],
-    key="nav_operativa"
-)
-
-# Línea divisoria real y estética en el HTML de la barra lateral
-st.sidebar.markdown("---")
-
-st.sidebar.subheader("📘 Soporte y Entrenamiento")
-seccion_pedagogica = st.sidebar.radio(
-    "Seleccione Módulo Académico:", 
-    [
-        "Ninguno - Ver Módulo Operativo",
+    "📘 SOPORTE Y ENTRENAMIENTO ACADÉMICO": [
         "1. Manual Técnico Digital",
         "2. Guías Rápidas de Campo",      
         "3. Sistema de Evaluación",
         "4. Entrenamiento Normativo",
         "5. Entrenamiento Cognitivo"
-    ],
-    key="nav_pedagogica"
-)
+    ]
+}
 
-# Lógica de ruteo unificada basada en la selección activa
-if seccion_pedagogica != "Ninguno - Ver Módulo Operativo":
-    seccion = seccion_pedagogica
+# Planificar la lista plana para el selectbox manteniendo los encabezados
+lista_desplegable = []
+for categoria, subitems in opciones_menu.items():
+    lista_desplegable.append(f"--- {categoria} ---")
+    lista_desplegable.extend(subitems)
+
+# Render del Selectbox único
+seleccion_cruda = st.sidebar.selectbox("Seleccione el Entorno de Trabajo:", lista_desplegable)
+
+# Lógica de bloqueo: si eligen un encabezado decorativo, por defecto va al Panel General
+if seleccion_cruda.startswith("---"):
+    seccion = "Panel Control General"
 else:
-    seccion = seccion_operativa
+    seccion = seleccion_cruda
 
 st.sidebar.markdown("---")
 st.sidebar.info("📌 **Control de Gestión:** Suite MENFA parametrizada bajo normas de transporte y seguridad industrial argentina (ENARGAS).")
