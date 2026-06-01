@@ -3,7 +3,7 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 
-def render_treatment(p_entrada, t_entrada):
+def render_tratamiento(p_entrada, t_entrada):
     st.header("💧 Módulo de Proceso: Deshidratación por Trietilenglicol (TEG)")
     st.caption("Simulación hidrodinámica del contacto interfacial gas/solvente y tren de regeneración térmica.")
     st.markdown("---")
