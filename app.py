@@ -1,111 +1,97 @@
 # app.py
 import streamlit as st
 
-# Configuración visual unificada de la plataforma MENFA
-st.set_page_config(page_title="MENFA - Simulador Gas Integrado", layout="wide")
+# --- CONFIGURACIÓN DE LA PÁGINA ---
+st.set_page_config(
+    page_title="Suite MENFA - Simulador de Producción y Plantas de Gas",
+    page_icon="🛢️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-st.title("🏭 MENFA - Suite de Simulación y Entrenamiento Integrado")
-st.caption("Consola unificada para la formación técnica y operativa en plantas de procesamiento y gasoductos.")
-
-# --- INICIALIZACIÓN DE VARIABLES EN SESIÓN GLOBAL ---
+# --- INICIALIZACIÓN DEL ESTADO GLOBAL (MEMORIA DINÁMICA) ---
 if 'p_entrada' not in st.session_state:
-    st.session_state.p_entrada = 3500.0
-    st.session_state.t_entrada = 20.0
-    st.session_state.nivel_liquido = 45.0
-    st.session_state.p_descarga_gasoducto = 6100.0
-    st.session_state.humedad_salida = 24.5
-    st.session_state.temp_reboiler = 182.0
+    st.session_state['p_entrada'] = 3500.0  # kPa base
+if 't_entrada' not in st.session_state:
+    st.session_state['t_entrada'] = 22.0    # °C base
+if 'nivel_liquido' not in st.session_state:
+    st.session_state['nivel_liquido'] = 45.0 # % base
+if 'humedad_salida' not in st.session_state:
+    st.session_state['humedad_salida'] = 24.5 # mg/m³ base
+if 'p_descarga_gasoducto' not in st.session_state:
+    st.session_state['p_descarga_gasoducto'] = 6100.0 # kPa base
 
-# --- MENÚ LATERAL DE NAVEGACIÓN ---
-# Insertamos el logo corporativo de la suite en la parte superior del sidebar
+# --- IMPORTACIÓN DE LOS MÓDULOS DE INGENIERÍA ---
+try:
+    from modulos.separacion import render_separacion
+    from modulos.procesamiento import render_procesamiento
+    from modulos.calidad_medicion import render_calidad_medicion
+    from modulos.servicios_auxiliares import render_servicios
+    from modulos.guias_rapidas import render_guias_rapidas
+    from modulos.evaluacion import render_evaluacion
+except ImportError as e:
+    st.error(f"Error al cargar los módulos secundarios: {e}")
+    st.stop()
+
+# --- MENÚ LATERAL DE NAVEGACIÓN (CON IDENTIDAD CORPORATIVA) ---
+# Se inserta el logo oficial cargado en la raíz del proyecto
 st.sidebar.image("logo_menfa.png", use_container_width=True)
+
+st.sidebar.title("🎛️ Matriz Operativa")
 seccion = st.sidebar.radio("Seleccione el Módulo de Trabajo:", [
     "Panel Control General",
     "Separación de Entrada",
-    "Tratamiento (TEG)",
-    "Planta Criogénica",
-    "Compresión y Gasoductos",
-    "Fraccionamiento de Líquidos",
-    "Calidad y Medición",
-    "Matriz de Seguridad (NAG-125)",
-    "Servicios Auxiliares",
-    "--------------------------------", # Separador visual en el menú
-    "1. Manual Técnico Digital",
-    "2. Guías Rápidas de Campo",      # <-- NUEVO: Módulo independiente de fichas dinámicas
-    "3. Sistema de Evaluación",
-    "4. Entrenamiento Normativo",
-    "5. Entrenamiento Cognitivo"
+    "Planta Criogénica y LGN",
+    "Calidad y Medición (ENARGAS)",
+    "Servicios Auxiliares & IIoT",
+    "--------------------------------",  # Separador visual
+    "Guías Rápidas de Campo",      
+    "Sistema de Evaluación"
 ])
 
 st.sidebar.markdown("---")
-st.sidebar.info("📌 **Control de Gestión:** Simulador configurado bajo normas de transporte y seguridad industrial.")
+st.sidebar.info("📌 **Control de Gestión:** Suite MENFA parametrizada bajo normas de transporte y seguridad industrial argentina (ENARGAS).")
 
-# --- ENRUTAMIENTO Y IMPORTACIÓN EN TIEMPO DE EJECUCIÓN ---
+# --- RUTEO LOGÍSTICO DE LAS PESTAÑAS ---
+
 if seccion == "Panel Control General":
-    st.subheader("📊 Resumen Operativo de la Planta")
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Presión Entrada", f"{st.session_state.p_entrada:.1f} kPa")
-    col2.metric("Presión Despacho", f"{st.session_state.p_descarga_gasoducto:.1f} kPa")
-    col3.metric("Nivel Separador", f"{st.session_state.nivel_liquido:.1f} %")
-    col4.metric("Calidad Gas", f"{st.session_state.humedad_salida:.1f} mg/m³")
+    st.title("🖥️ Consola Central Scada - Suite MENFA")
+    st.caption("Resumen ejecutivo del estado de las variables de proceso y lazos cerrados de control de la planta.")
+    st.markdown("---")
+    
+    # Vista sinóptica general empleando las variables en memoria activa
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Presión Separador V-101", f"{st.session_state['p_entrada']:.1f} kPa")
+    col2.metric("Nivel de Líquido de Entrada", f"{st.session_state['nivel_liquido']:.1f} %")
+    col3.metric("Humedad de Despacho Comercial", f"{st.session_state['humedad_salida']:.1f} mg/m³")
+    
+    st.markdown("### 🗺️ Diagrama de Flujo del Proceso (PFD)")
+    st.info("💡 **Guía de Navegación:** Utilice la 'Matriz Operativa' del panel izquierdo para ingresar a cada bloque específico de ingeniería, modificar las aperturas de válvulas de control o alterar los escenarios dinámicos del yacimiento.")
 
 elif seccion == "Separación de Entrada":
-    from modulos.separacion import render_separacion
-    p, t, nv = render_separacion()
-    st.session_state.p_entrada = p
-    st.session_state.t_entrada = t
-    st.session_state.nivel_liquido = nv
+    # Ejecuta el motor hidrodinámico de separación (El Pozo Ilustrado)
+    p_op, t_op, niv_op = render_separacion()
+    # Actualiza los estados globales para que los otros módulos lean los desvíos en vivo
+    st.session_state['p_entrada'] = p_op
+    st.session_state['t_entrada'] = t_op
+    st.session_state['nivel_liquido'] = niv_op
 
-elif seccion == "Tratamiento (TEG)":
-    from modulos.tratamiento import render_tratamiento
-    h_salida, t_reb = render_tratamiento(st.session_state.p_entrada, st.session_state.t_entrada)
-    st.session_state.humedad_salida = h_salida
-    st.session_state.temp_reboiler = t_reb
+elif seccion == "Planta Criogénica y LGN":
+    # Pasa las condiciones de entrada actuales para calcular el enfriamiento por expansión isentrópica
+    render_procesamiento(st.session_state['p_entrada'], st.session_state['t_entrada'])
 
-elif seccion == "Planta Criogénica":
-    from modulos.procesamiento import render_procesamiento
-    render_procesamiento(st.session_state.p_entrada, st.session_state.t_entrada)
-
-elif seccion == "Compresión y Gasoductos":
-    from modulos.transporte import render_transporte
-    st.session_state.p_descarga_gasoducto = render_transporte()
-
-elif seccion == "Fraccionamiento de Líquidos":
-    from modulos.fraccionamiento_lgn import render_fraccionamiento
-    render_fraccionamiento()
-
-elif seccion == "Calidad y Medición":
-    from modulos.calidad_medicion import render_calidad_medicion
+elif seccion == "Calidad y Medición (ENARGAS)":
+    # Evalúa el cumplimiento normativo de la transferencia de custodia
     render_calidad_medicion()
 
-elif seccion == "Matriz de Seguridad (NAG-125)":
-    from modulos.seguridad import render_seguridad
-    render_seguridad()
-
-elif seccion == "Servicios Auxiliares":
-    from modulos.servicios_auxiliares import render_servicios
+elif seccion == "Servicios Auxiliares & IIoT":
+    # Despliega el módulo predictivo basado en LoRaWAN para el equipo de bombeo
     render_servicios()
 
-elif seccion == "1. Manual Técnico Digital":
-    from modulos.manual_digital import render_manual
-    render_manual()
-
-elif seccion == "2. Guías Rápidas de Campo":
-    # <-- NUEVO: Llamada al módulo visual fácil de interpretar
-    from modulos.guias_rapidas import render_guias_rapidas
+elif seccion == "Guías Rápidas de Campo":
+    # Despliega el soporte técnico y el glosario bilingüe de Weatherford
     render_guias_rapidas()
 
-elif seccion == "3. Sistema de Evaluación":
-    from modulos.evaluacion import render_evaluacion
+elif seccion == "Sistema de Evaluación":
+    # Audita las variables de sesión y califica al alumno con Nombre y DNI
     render_evaluacion()
-
-elif seccion == "4. Entrenamiento Normativo":
-    from modulos.normativo import render_normativo
-    render_normativo()
-
-elif seccion == "5. Entrenamiento Cognitivo":
-    from modulos.cognitivo import render_cognitivo
-    render_cognitivo()
-
-elif seccion == "--------------------------------":
-    st.warning("👈 Por favor, seleccione una sección operativa válida del menú lateral.")
