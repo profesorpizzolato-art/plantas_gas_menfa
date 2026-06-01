@@ -71,7 +71,7 @@ if seccion == "Panel Control General":
     col4.metric("Presión Despacho Troncal", f"{st.session_state['p_descarga_gasoducto']:.1f} kPa")
     
     st.markdown("### 🗺️ Diagrama de Flujo de Procesos (PFD)")
-    st.info("💡 **Indicación al Operador:** Seleccione un módulo de la barra lateral para intervenir las variables analógicas o gestionar los escenarios de contingencia de las cuencas.")
+    st.info("💡 **Indicación al Operador:** Seleccione un módulo de la barra lateral para intervenir las variables analógicas o gestionar los escenarios de開contingencia de las cuencas.")
 
 elif seccion == "Separación de Entrada":
     p_op, t_op, niv_op = render_separacion()
@@ -88,41 +88,42 @@ elif seccion == "Calidad y Medición (ENARGAS)":
 elif seccion == "Servicios Auxiliares & IIoT":
     render_servicios()
 
-# --- REHABILITACIÓN COMPLETA DEL BLOQUE PEDAGÓGICO ---
-
+# =====================================================================
+# --- MANUAL TÉCNICO DIGITAL EXHAUSTIVO DE PROCESOS (RECONSTRUIDO) ---
+# =====================================================================
 elif seccion == "1. Manual Técnico Digital":
-    st.title("📘 1. Manual Técnico Digital de Operaciones")
-    st.caption("Fundamentos teóricos e ingeniería de procesos de la planta según la bibliografía técnica oficial de la Suite MENFA.")
+    st.title("📘 Manual Técnico de Ingeniería de Procesos y Operaciones")
+    st.caption("Documentación oficial de diseño, ecuaciones fundamentales de control y matrices de enclavamiento de la Suite MENFA.")
     st.markdown("---")
     
-    m_tabs = st.tabs(["🕳️ Dinámica de Pozos", "💧 Deshidratación por TEG", "🌀 Turbocompresión & Surge"])
+    # Índice modularizado de alta densidad teórica
+    m_tabs = st.tabs([
+        "🛢️ Cap. 1: Separación Primaria", 
+        "💧 Cap. 2: Absorción y Deshidratación", 
+        "❄️ Cap. 3: Termodinámica Criogénica", 
+        "🌀 Cap. 4: Turbocompresión y Dinámica",
+        "🛡️ Cap. 5: Protocolos de Custodia ENARGAS"
+    ])
     
+    # --- CAPÍTULO 1 ---
     with m_tabs[0]:
-        st.markdown("### Mecanismos de Empuje e Interfaz de Fluidos")
-        st.write("Según *El Pozo Ilustrado*, la energía natural del yacimiento gobierna las proporciones de gas y corte de agua (BS&W) en la entrada de la planta. Comprender si el empuje es por capa de gas o hidráulico permite anticipar inundaciones en el separador primario V-101.")
+        st.header("Capítulo 1: Separación de Entrada y Dinámica del Subsuelo")
+        st.markdown("""
+        El comportamiento hidrodinámico del separador horizontal primario (V-101) responde directamente a la caracterización física y energética del subsuelo según los lineamientos de *El Pozo Ilustrado*. 
+        """)
         
-    with m_tabs[1]:
-        st.markdown("### Absorción e Interlocks Térmicos en Torres de Glicol")
-        st.write("Basado en los estudios de deshidratación de *Dialnet*, el gas natural debe reducir su vapor de agua por debajo del límite regulatorio. El manual establece que ante fallas de temperatura en el reboiler, la degradación del Trietilanglicol (TEG) es crítica si supera los 204°C, activando un interlock de corte automático.")
-        
-    with m_tabs[2]:
-        st.markdown("### Termodinámica y Control de Surge en Compresores")
-        st.write("De acuerdo con la ingeniería de *Techint* e *Instrumentation*, el fenómeno de Surge (bombeo aerodinámico) ocurre por caídas bruscas de caudal o contrapresiones extremas del gasoducto. Esto induce vibración axial violenta destructiva para los álabes, requiriendo la apertura rápida de la Anti-Surge Valve (ASV).")
-
-elif seccion == "2. Guías Rápidas de Campo":
-    render_guias_rapidas()
-
-elif seccion == "3. System de Evaluación":
-    render_evaluacion()
-
-elif seccion == "4. Entrenamiento Normativo":
-    st.title("📜 4. Entrenamiento Normativo & Regulatorio")
-    st.caption("Módulo de adiestramiento en legislación técnica y resoluciones del ENARGAS.")
-    st.markdown("---")
-    st.info("💡 **Marco de Aplicación Nacional:** En este espacio los alumnos se entrenan bajo las especificaciones de calidad de la NAG-100 y resoluciones vigentes para la entrega conforme de gas natural a los gasoductos de transporte interconectados.")
-
-elif seccion == "5. Entrenamiento Cognitivo":
-    st.title("🧠 5. Entrenamiento Cognitivo y Análisis de Fallas")
-    st.caption("Simulación de escenarios complejos ocultos para el desarrollo del criterio operativo.")
-    st.markdown("---")
-    st.warning("⚠️ **Módulo Avanzado:** Espacio diseñado para inyectar fallas encadenadas en la planta (ej: pérdida de señal de telemetría IIoT coincidente con un golpe de bomba en el Upstream), obligando al operador a diagnosticar la raíz del problema mediante telemetría desactualizada.")
+        col_c1_1, col_c1_2 = st.columns(2)
+        with col_c1_1:
+            st.subheader("1.1 Parámetros de Diseño y Leyes de Asentamiento")
+            st.markdown("""
+            El volumen útil está dimensionado para garantizar un **tiempo de residencia mínimo ($\tau$) de 3 a 5 minutos**, permitiendo que la diferencia de densidades segregue las fases y evitando el fenómeno de arrastre de líquido en la corriente de gas (*Carry-over*).
+            
+            La velocidad de diseño del gas para impedir que gotas de líquido mayores a 150 micrones alcancen el tope del recipiente se rige por la ecuación de Saunders-Brown:
+            """)
+            st.latex(r"V_c = K \cdot \sqrt{\frac{\rho_L - \rho_G}{\rho_G}}")
+            st.caption("Donde $K$ representa el factor empírico del extractor de niebla (*mist extractor*), y $\rho_L, \rho_G$ son las densidades de las fases líquida y gaseosa.")
+            
+        with col_c1_2:
+            st.subheader("1.2 Mecanismos de Empuje y Modos de Falla")
+            st.markdown("""
+            * **Empuje Hidráulico Activo (*Water Drive*):
