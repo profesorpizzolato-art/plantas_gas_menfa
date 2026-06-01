@@ -35,25 +35,45 @@ except ImportError as e:
 
 # --- MENÚ LATERAL CON IDENTIDAD CORPORATIVA MENFA ---
 st.sidebar.image("logo_menfa.png", use_container_width=True)
-st.sidebar.title("🎛️ Matriz Operativa")
 
-seccion = st.sidebar.radio("Seleccione el Módulo de Trabajo:", [
-    "Panel Control General",
-    "Separación de Entrada",
-    "Planta Criogénica y LGN",
-    "Calidad y Medición (ENARGAS)",
-    "Servicios Auxiliares & IIoT",
-    "--------------------------------",  # Separador visual en la interfaz
-    "1. Manual Técnico Digital",
-    "2. Guías Rápidas de Campo",      
-    "3. Sistema de Evaluación",
-    "4. Entrenamiento Normativo",
-    "5. Entrenamiento Cognitivo"
-])
+st.sidebar.subheader("🎛️ Módulos de Operación")
+seccion_operativa = st.sidebar.radio(
+    "Seleccione Planta / Proceso:", 
+    [
+        "Panel Control General",
+        "Separación de Entrada",
+        "Planta Criogénica y LGN",
+        "Calidad y Medición (ENARGAS)",
+        "Servicios Auxiliares & IIoT"
+    ],
+    key="nav_operativa"
+)
+
+# Línea divisoria real y estética en el HTML de la barra lateral
+st.sidebar.markdown("---")
+
+st.sidebar.subheader("📘 Soporte y Entrenamiento")
+seccion_pedagogica = st.sidebar.radio(
+    "Seleccione Módulo Académico:", 
+    [
+        "Ninguno - Ver Módulo Operativo",
+        "1. Manual Técnico Digital",
+        "2. Guías Rápidas de Campo",      
+        "3. Sistema de Evaluación",
+        "4. Entrenamiento Normativo",
+        "5. Entrenamiento Cognitivo"
+    ],
+    key="nav_pedagogica"
+)
+
+# Lógica de ruteo unificada basada en la selección activa
+if seccion_pedagogica != "Ninguno - Ver Módulo Operativo":
+    seccion = seccion_pedagogica
+else:
+    seccion = seccion_operativa
 
 st.sidebar.markdown("---")
 st.sidebar.info("📌 **Control de Gestión:** Suite MENFA parametrizada bajo normas de transporte y seguridad industrial argentina (ENARGAS).")
-
 # =====================================================================
 # --- RUTEO LOGÍSTICO Y DESPLIEGUE DE PESTAÑAS ---
 # =====================================================================
