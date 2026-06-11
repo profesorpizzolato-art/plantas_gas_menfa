@@ -55,7 +55,7 @@ def login_usuario(usuario, password):
         st.session_state['autenticado'] = True
         st.session_state['rol'] = "Instructor"
         st.rerun()
-    elif usuario == "alumno" and password == "ipcl2026":
+    elif usuario == "alumno" and password == "alumno2026":
         st.session_state['autenticado'] = True
         st.session_state['rol'] = "Operador en Entrenamiento"
         st.rerun()
