@@ -3,7 +3,7 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 
-def render_procesamiento(p_entrada, t_entrada):
+def render_procesamiento():
     st.header("❄️ Planta Criogénica por Turboexpander y Fraccionamiento de LGN")
     st.caption("Simulación de refrigeración extrema por caída de presión entálpica y separación por cortes de ebullición de LGN.")
     st.markdown("---")
