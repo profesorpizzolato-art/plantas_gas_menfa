@@ -27,6 +27,10 @@ def render_procesamiento():
 
     st.markdown("---")
 
+    # --- CONEXIÓN COMPLETA CON EL ESTADO GLOBAL (Mapeo preventivo de NameError) ---
+    p_entrada = st.session_state.get('p_entrada', 3500.0)
+    t_entrada = st.session_state.get('t_entrada', 22.0)
+
     # --- MOTOR MATEMÁTICO DE PROCESO (LGN / TECHINT) ---
     # Cálculo dinámico del efecto de enfriamiento por expansión
     if eficiencia_jt:
@@ -42,8 +46,14 @@ def render_procesamiento():
 
     t_criogenica = float(t_entrada - drop_temp)
 
+    # Guardado de variables de proceso calculadas en la memoria global
+    st.session_state['t_separador_frio'] = t_criogenica
+    st.session_state['rendimiento_liquidos'] = rendimiento_liquidos
+    # El caudal de líquidos varía en base al rendimiento de la planta criogénica
+    st.session_state['caudal_lgn'] = (st.session_state.get('caudal_gas', 5.0) * 24.0) * (rendimiento_liquidos / 100.0)
+
     # Simulación del fraccionamiento de líquidos (Cortes comerciales)
-    # Si el reboiler de la Deetandizadora está muy frío, el etano contamina los líquidos del fondo (fuera de especificación)
+    # Si el reboiler de la Deetandizadora está muy frío, el etano contamina los líquidos del fondo
     off_spec_etano = temp_reboiler_deeth < 82.0 or temp_reboiler_deeth > 95.0
     # Si el reflujo es bajo, el GLP se contamina con pesados
     off_spec_glp = reflejo_debut < 1.8
@@ -69,9 +79,9 @@ def render_procesamiento():
 
     # --- ALERTAS OPERATIVAS ---
     if t_criogenica > -30.0:
-        st.error("🚨 **ALERTA DE PROCESO:** La temperatura en el separador frío es demasiado alta ($> -30^\\circ\\text{C}$). Los componentes ricos (C2, C3 y C4) permanecen en fase gaseosa y se pierden por la línea de gas residual. *Acción:* Cierre el bypass J-T o aumente la caída de presión en el Expander.")
+        st.error("🚨 **ALERTA DE PROCESO:** La temperatura en el separador frío es demasiado alta ($>-30^\\circ\\text{C}$). Los componentes ricos (C2, C3 y C4) permanecen en fase gaseosa y se pierden por la línea de gas residual. *Acción:* Cierre el bypass J-T o aumente la caída de presión en el Expander.")
     if off_spec_etano:
-        st.warning("⚠️ **DESVIACIÓN EN EN DEETANDIZADORA:** Temperatura fuera de rango óptimo ($82^\\circ\text{C} - 95^\\circ\text{C}$). Hay arrastre de metano por fondo o pérdida de etano por cabeza.")
+        st.warning("⚠️ **DESVIACIÓN EN DEETANDIZADORA:** Temperatura fuera de rango óptimo ($82^\\circ\\text{C} - 95^\\circ\\text{C}$). Hay arrastre de metano por fondo o pérdida de etano por cabeza.")
 
     # --- GRÁFICO DE RENDIMIENTO DE FRACCIONAMIENTO ---
     st.markdown("### 📈 Perfil de Destilación de Líquidos (LGN)")
