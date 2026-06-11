@@ -13,7 +13,7 @@ BANCO_40_PREGUNTAS = [
             "Disminuye la temperatura de disociación, permitiendo operar con mayor contenido de agua libre.",
             "No altera el equilibrio termodinámico, solo modifica el tiempo de residencia."
         ],
-        "correcta": "Aumenta la temperatura de formación, desplazando la operación hacia la zona de riesgo de cristalización.",
+        "correcta": "Aumenta la temperatura de formación, desplazando la operation hacia la zona de riesgo de cristalización.",
         "feedback": "A presiones más elevadas, las moléculas de agua necesitan menor subenfriamiento para estructurar las 'jaulas' cristalinas (clatratos)."
     },
     {
@@ -298,7 +298,7 @@ BANCO_40_PREGUNTAS = [
         "pregunta": "24. ¿Cuál es el riesgo crítico de que la concentración de CO2 en el gas de entrada a la sección criogénica supere los límites de especificación (ej. > 0.5-1.0% molar)?",
         "opciones": [
             "Corrosión galvánica acelerada en los aeroenfriadores de salida.",
-            "Congelamiento y solidificación del CO2 en los canales del intercambiador de placas (Cold Box) y platos superiores de la Demetinizadora.",
+            "Congelamiento y solidificación del CO2 en los canales del intercambiador de placas (Cold Box) and platos superiores de la Demetinizadora.",
             "Aumento incontrolable de la presión de vapor en el fondo de la deetanizadora."
         ],
         "correcta": "Congelamiento y solidificación del CO2 en los canales del intercambiador de placas (Cold Box) y platos superiores de la Demetinizadora.",
@@ -442,66 +442,66 @@ BANCO_40_PREGUNTAS = [
     },
 
     # ==========================================
-    # MÓDULO VI: PROTECCIONES Y NORMA NAG-125 (Preguntas 36 a 40)
+    # MÓDULO VI: PROTECCIONES Y NORMA NAG-125 / SIS (Preguntas 36 a 40)
     # ==========================================
     {
         "id": 36,
         "modulo": "Módulo VI",
-        "pregunta": "36. Bajo la filosofía de seguridad 'Fail-Safe' (NAG-125), ¿cómo deben actuar las válvulas de bloqueo (SDV) y despresurización (BDV) ante una pérdida de aire de instrumentos?",
+        "pregunta": "36. Bajo la filosofía de seguridad 'Fail-Safe' de la planta, ¿cómo deben actuar las válvulas de bloqueo (SDV) y de despresurización (BDV) ante una pérdida total del suministro de aire de instrumentos?",
         "opciones": [
-            "Las SDV abren para liberar el inventario y las BDV cierran para confinar la planta.",
-            "Tanto las SDV como las BDV permanecen bloqueadas en su última posición operativa.",
-            "Las SDV cierran herméticamente (Fail-Close) para aislar fronteras y las BDV abren (Fail-Open) para despresurizar hacia la antorcha."
+            "Las SDV deben abrir por completo para liberar la línea y las BDV deben cerrar para contener el inventario.",
+            "Las SDV deben cerrar herméticamente (Fail-Close) para aislar las unidades y las BDV deben abrir (Fail-Open) para aliviar la presión de la planta hacia la antorcha.",
+            "Ambas válvulas deben bloquearse en su última posición operativa (Fail-Locked) hasta que se restablezca el servicio."
         ],
-        "correcta": "Las SDV cierran herméticamente (Fail-Close) para aislar fronteras y las BDV abren (Fail-Open) para despresurizar hacia la antorcha.",
-        "feedback": "La arquitectura 'desenergizar para disparar' asegura que por acción de resortes mecánicos internos, la planta quede automáticamente aislada y despresurizada ante fallas críticas de servicios."
+        "correcta": "Las SDV deben cerrar herméticamente (Fail-Close) para aislar las unidades y las BDV deben abrir (Fail-Open) para aliviar la presión de la planta hacia la antorcha.",
+        "feedback": "La condición segura ante falla de energía neumática o eléctrica exige aislar las fuentes de alimentación de hidrocarburos (SDV) y despresurizar el inventario confinado (BDV)."
     },
     {
         "id": 37,
         "modulo": "Módulo VI",
-        "pregunta": "37. ¿Qué diferencia regulatoria e instrumental existe entre el DCS (Sistema de Control de Procesos) y el SIS (Sistema Instrumentado de Seguridad) según la NAG-125?",
+        "pregunta": "37. ¿Qué representa el nivel de Integridad de Seguridad 'SIL' (Safety Integrity Level) asignado a un lazo de protección instrumentado (ESD)?",
         "opciones": [
-            "El DCS y el SIS deben compartir el mismo procesador físico y la misma pantalla de operación para agilizar la toma de decisiones.",
-            "El SIS debe estar lógica y físicamente desacoplado del DCS, operando con hardware dedicado y certificado (PLC de Seguridad SIL-2/3) independiente del control diario.",
-            "El DCS maneja las paradas de emergencia globales de planta y el SIS regula los lazos PID de flujo."
+            "La capacidad de resistencia mecánica del cuerpo de las válvulas frente a incendios prolongados.",
+            "Una medida cuantitativa del rendimiento de seguridad y la probabilidad de falla en demanda (PFD) de una función instrumentada de seguridad.",
+            "El espesor de corrosión admisible en los recipientes a presión antes de su retiro de servicio."
         ],
-        "correcta": "El SIS debe estar lógica y físicamente desacoplado del DCS, operando con hardware dedicado y certificado (PLC de Seguridad SIL-2/3) independiente del control diario.",
-        "feedback": "La independencia del SIS garantiza que ante un colapso generalizado del DCS de control operativo, los lazos de protección automatizados actúen de manera infalible."
+        "correcta": "Una medida cuantitativa del rendimiento de seguridad y la probabilidad de falla en demanda (PFD) de una función instrumentada de seguridad.",
+        "feedback": "A mayor nivel SIL (del 1 al 4), menor es la probabilidad de que el lazo falle cuando ocurra una contingencia real en la planta."
     },
     {
         "id": 38,
         "modulo": "Módulo VI",
-        "pregunta": "38. ¿Qué protocolo estricto define la activación de una Parada de Emergencia Nivel 1 (ESD Nivel 1) en la planta?",
+        "pregunta": "38. ¿Cuál es la arquitectura mínima de votación recomendada en transmisores de presión (PT) para un lazo de disparo crítico de planta si se busca alta disponibilidad sin paradas intempestivas por falla del instrumento?",
         "opciones": [
-            "Parada localizada del tren de generación eléctrica auxiliar.",
-            "Aislamiento total e inmediato de todas las fronteras de la planta (cierre de SDVs) y despresurización automatizada completa de los inventarios de gas de proceso hacia la antorcha a través de las BDVs.",
-            "Apertura del bypass general del slug catcher para derivar la producción directo a gasoducto sin tratamiento."
+            "Arquitectura 1oo1 (Uno de uno).",
+            "Arquitectura 1oo2 (Uno de dos).",
+            "Arquitectura 2oo3 (Dos de tres)."
         ],
-        "correcta": "Aislamiento total e inmediato de todas las fronteras de la planta (cierre de SDVs) y despresurización automatizada completa de los inventarios of gas de proceso hacia la antorcha a través de las BDVs.",
-        "feedback": "El ESD Nivel 1 es el máximo nivel de resguardo ante catástrofes, incendios o fugas masivas, minimizando la energía acumulada en las instalaciones en minutos."
+        "correcta": "Arquitectura 2oo3 (Dos de tres).",
+        "feedback": "La votación 2oo3 combina alta seguridad y alta disponibilidad, permitiendo ignorar la lectura anómala de un transmisor dañado sin gatillar un disparo falso de la planta."
     },
     {
         "id": 39,
         "modulo": "Módulo VI",
-        "pregunta": "39. ¿Qué significa operativamente que una función de seguridad instrumentada tenga una lógica de votación '2oo3' (Dos de Tres) en los transmisores de presión de una planta?",
+        "pregunta": "39. Durante un evento de parada de emergencia por fuego en el pool de bombas de despacho (ESD Nivel 2), ¿cuál es la primera línea de defensa automatizada?",
         "opciones": [
-            "Que la válvula disparará solo si los tres transmisores fallan al mismo tiempo.",
-            "Que el PLC de seguridad ejecutará el disparo de la planta si al menos dos de los tres sensores independientes validan de forma simultánea la condición de alarma.",
-            "Que se promedian las dos lecturas más bajas ignorando de manera permanente la lectura del tercer sensor."
+            "El arranque de los generadores eléctricos de respaldo.",
+            "El cierre automático de las SDV de aislamiento de esferas y tanques, el apagado de motores y la activación del sistema de extinción por espuma/agua.",
+            "Aumentar el caudal de gas de despojamiento en los reboilers."
         ],
-        "correcta": "Que el PLC de seguridad ejecutará el disparo de la planta si al menos dos de los tres sensores independientes validan de forma simultánea la condición de alarma.",
-        "feedback": "La lógica 2oo3 equilibra perfectamente la seguridad y la disponibilidad operacional, evitando paradas espurias por falla de un único sensor y garantizando el disparo si hay una emergencia real."
+        "correcta": "El cierre automático de las SDV de aislamiento de esferas y tanques, el apagado de motores y la activación del sistema de extinción por espuma/agua.",
+        "feedback": "El ESD Nivel 2 aísla y secciona áreas operativas específicas deteniendo equipos rotantes para cortar el aporte de energía al foco del incendio."
     },
     {
         "id": 40,
         "modulo": "Módulo VI",
-        "pregunta": "40. De acuerdo con las buenas prácticas de ingeniería de seguridad, ¿cuál es el propósito de realizar una prueba de recorrido parcial (Partial Stroke Testing - PST) a una válvula de corte crítico (SDV) mientras la planta está en plena operación?",
+        "pregunta": "40. ¿Cuál es el propósito operativo de las válvulas de alivio térmico (PST) instaladas en los tramos de cañería que pueden quedar bloqueados entre dos válvulas de corte?",
         "opciones": [
-            "Calibrar el posicionador digital para modificar el set-point del lazo de flujo.",
-            "Mover la válvula una fracción pequeña de su carrera (ej. 10%-15%) para verificar que el actuador no esté agarrotado o bloqueado mecánicamente, sin interrumpir el proceso.",
-            "Comprobar el sello estanco de las empaquetaduras internas inyectando grasa selladora a presión."
+            "Regular la velocidad lineal del flujo de gas durante el arranque.",
+            "Aliviar incrementos de presión peligrosos generados por la expansión térmica del líquido atrapado debido a la radiación solar o fuentes de calor externas.",
+            "Ventar los componentes no condensables de forma continua."
         ],
-        "correcta": "Mover la válvula una fracción pequeña de su carrera (ej. 10%-15%) para verificar que el actuador no esté agarrotado o bloqueado mecánicamente, sin interrumpir el proceso.",
-        "feedback": "El PST permite detectar fallas ocultas (fricciones excesivas o resortes vencidos) incrementando el intervalo de prueba total y reduciendo la probabilidad de falla en demanda."
+        "correcta": "Aliviar incrementos de presión peligrosos generados por la expansión térmica del líquido atrapado debido a la radiación solar o fuentes de calor externas.",
+        "feedback": "Los líquidos atrapados tienen un coeficiente de expansión térmica elevado; sin una válvula de alivio pequeña (PST), el aumento de temperatura ambiente destruiría mecánicamente la cañería."
     }
 ]
