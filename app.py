@@ -132,14 +132,67 @@ else:
         if st.session_state['esd_bloqueo_general']:
             st.error("🚨 PARADA DE EMERGENCIA ACTIVA: Todas las plantas se encuentran aisladas y despresurizadas hacia la antorcha.")
         
+        # Extracción segura de estados dinámicos recalculados por otros módulos
+        nivel_separador = st.session_state.get('nivel_liquido', 45.0)
+        temp_criogenica = st.session_state.get('t_separador_frio', -65.0)
+        eficiencia_lgn = st.session_state.get('rendimiento_liquidos', 85.0)
+
+        # Mapeo de métricas en panel superior
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("Presión Entrada (V-101)", f"{st.session_state['p_entrada']:.1f} kPa")
-        col2.metric("Nivel Domo Separador", f"{st.session_state['nivel_liquido']:.1f} %")
+        col2.metric("Nivel Domo Separador", f"{nivel_separador:.1f} %")
         col3.metric("Humedad Gas de Salida", f"{st.session_state['humedad_salida']:.1f} mg/m³")
         col4.metric("Presión Despacho Troncal", f"{st.session_state['p_descarga_gasoducto']:.1f} kPa")
         
+        st.markdown("---")
+        
+        # --- NUEVO: GRÁFICO HISTÓRICO / TENDENCIAS DE PROCESO INTEGRADO ---
+        st.markdown("### 📈 Historial de Tendencias DCS (Línea de Proceso Integral)")
+        
+        # Generamos una curva de simulación basada en el estado actual para simular el histórico del Scada
+        import numpy as np
+        import plotly.graph_objects as go
+        
+        t_eje = np.linspace(0, 24, 50)
+        # Ruido blanco operativo normal (simulación de sensores reales)
+        ruido_p = np.sin(t_eje) * 15.0 
+        ruido_t = np.cos(t_eje) * 0.8
+        
+        curva_p = np.full(50, st.session_state['p_entrada']) + ruido_p
+        curva_t = np.full(50, temp_criogenica) + ruido_t
+        
+        # Configuración del gráfico con doble eje Y (Presión vs Temperatura)
+        fig_scada = go.Figure()
+        
+        # Línea de Presión de Entrada
+        fig_scada.add_trace(go.Scatter(
+            x=t_eje, y=curva_p, name="Presión Entrada (kPa)",
+            line=dict(color="#00cc96", width=2.5), yaxis="y1"
+        ))
+        
+        # Línea de Temperatura Criogénica
+        fig_scada.add_trace(go.Scatter(
+            x=t_eje, y=curva_t, name="Temp. Separador Frío (°C)",
+            line=dict(color="#636efa", width=2.5, dash="dash"), yaxis="y2"
+        ))
+        
+        # Diseño estético estilo pantalla de control industrial (DCS)
+        fig_scada.update_layout(
+            template="plotly_dark",
+            height=320,
+            margin=dict(l=40, r=40, t=20, b=20),
+            hovermode="x unified",
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            xaxis=dict(title="Tiempo Operativo Reciente (Horas)", gridcolor="#2d3138"),
+            yaxis=dict(title="Presión Base (kPa)", side="left", gridcolor="#2d3138"),
+            yaxis2=dict(title="Temperatura (°C)", side="right", overlaying="y", gridcolor="rgba(0,0,0,0)")
+        )
+        
+        st.plotly_chart(fig_scada, use_container_width=True)
+        
+        st.markdown("---")
         st.markdown("### 🗺️ Diagrama de Flujo de Procesos Integral (PFD)")
-        st.info("💡 **Guía del Instructor:** Modifique las condiciones de diseño dentro del **Manual Técnico** para evaluar cómo reaccionan estos indicadores analógicos en tiempo real.")
+        st.info("💡 **Guía del Instructor:** Modifique las condiciones de diseño dentro del **Manual Técnico** o altere las perillas de la **Planta Criogénica** para evaluar cómo reaccionan estos indicadores analógicos en tiempo real.")
 
     elif seccion == "Separación de Entrada":
         render_separacion()
