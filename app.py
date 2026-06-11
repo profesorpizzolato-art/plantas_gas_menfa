@@ -11,6 +11,10 @@ st.set_page_config(
 
 # --- INICIALIZACIÓN EXPANDIDA DEL ESTADO GLOBAL (MEMORIA OPERATIVA DE PLANTA) ---
 
+# Control de acceso en Session State
+if 'autenticado' not in st.session_state: st.session_state['autenticado'] = False
+if 'rol' not in st.session_state: st.session_state['rol'] = None
+
 # 1. Variables Base de Entrada y Colector Principal
 if 'p_entrada' not in st.session_state: st.session_state['p_entrada'] = 3500.0          # kPa
 if 't_entrada' not in st.session_state: st.session_state['t_entrada'] = 22.0            # °C
@@ -42,7 +46,54 @@ if 'falla_hidratos_activa' not in st.session_state: st.session_state['falla_hidr
 if 'esd_bloqueo_general' not in st.session_state: st.session_state['esd_bloqueo_general'] = False
 
 
-# --- IMPORTACIÓN SEGURA DE LA SUITE MODULAR MENFA ---
+# =====================================================================
+# --- INTERFAZ DE PORTADA INSTITUCIONAL Y SISTEMA DE LOGIN ---
+# =====================================================================
+
+def login_usuario(usuario, password):
+    if usuario == "admin" and password == "menfa2026":
+        st.session_state['autenticado'] = True
+        st.session_state['rol'] = "Instructor"
+        st.rerun()
+    elif usuario == "alumno" and password == "ipcl2026":
+        st.session_state['autenticado'] = True
+        st.session_state['rol'] = "Operador en Entrenamiento"
+        st.rerun()
+    else:
+        st.error("❌ Credenciales incorrectas. Verifique el Usuario o la Clave de Acceso.")
+
+if not st.session_state['autenticado']:
+    col_izq, col_centro, col_der = st.columns([1, 5, 1])
+    
+    with col_centro:
+        st.image("logo_menfa.png", width=280)
+        st.title("🏭 SUITE INTEGRAL DE SIMULACIÓN DE PLANTAS DE GAS")
+        st.subheader("Plataforma Digital de Entrenamiento Avanzado y Control de Procesos")
+        
+        st.markdown("""
+        Bienvenido al entorno virtual de simulación **MENFA**. Esta plataforma ha sido diseñada para la formación 
+        y el entrenamiento técnico operativo en procesos de tratamiento, acondicionamiento y fraccionamiento de gas natural.
+        
+        * **Módulos Operativos:** Separación Líquido-Gas, Endulzamiento por Aminas, Planta Criogénica y Despacho.
+        * **Entorno de Aprendizaje:** Enlace directo con guías de campo (SOP) y simulación dinámica de fallas en sala de control.
+        """)
+        
+        st.markdown("---")
+        
+        with st.container(border=True):
+            st.markdown("### 🔐 Control de Acceso al DCS Central")
+            input_user = st.text_input("Usuario del Sistema (Legajo):", placeholder="Ej: alumno")
+            input_pass = st.text_input("Clave de Seguridad Operativa:", type="password", placeholder="••••••••")
+            
+            btn_ingresar = st.button("Validar Credenciales e Ingresar", use_container_width=True)
+            if btn_ingresar:
+                login_usuario(input_user, input_pass)
+                
+        st.caption("🔒 Acceso restringido. Los intentos de inicio de sesión quedan registrados en la auditoría del servidor.")
+    st.stop()
+
+
+# --- IMPORTACIÓN SEGURA DE LA SUITE MODULAR MENFA (SOLO SI PASÓ EL LOGIN) ---
 try:
     from modulos.separacion import render_separacion
     from modulos.tratamiento import render_tratamiento
@@ -66,6 +117,9 @@ except ImportError as e:
 
 # --- MENÚ LATERAL INDUSTRIAL MENFA ---
 st.sidebar.image("logo_menfa.png", use_container_width=True)
+
+# Muestra el rol autenticado en la barra lateral
+st.sidebar.markdown(f"**👤 Perfil:** {st.session_state['rol']}")
 
 st.sidebar.markdown("### 🏭 Operación de Planta")
 seccion = st.sidebar.radio(
@@ -99,8 +153,14 @@ pedagogico = st.sidebar.radio(
 )
 
 st.sidebar.markdown("---")
+if st.sidebar.button("🚪 Cerrar Sesión", use_container_width=True):
+    st.session_state['autenticado'] = False
+    st.session_state['rol'] = None
+    st.rerun()
+
+st.sidebar.markdown("---")
 if st.session_state['esd_bloqueo_general']:
-    st.sidebar.error("🚨 SISTEMA EN PARADA DE EMBENCIA (ESD)")
+    st.sidebar.error("🚨 SISTEMA EN PARADA DE EMERGENCIA (ESD)")
 else:
     st.sidebar.success("🟢 DCS Planta Operativa en Línea")
 
@@ -109,7 +169,6 @@ else:
 # --- ENRUTADOR LOGÍSTICO COMPLETO ---
 # =====================================================================
 
-# Prioridad al ruteo de herramientas pedagógicas si están seleccionadas
 if pedagogico != "Ninguno - Modo Operativo Activo":
     if "1. Manual" in pedagogico:
         render_manual()
@@ -123,7 +182,6 @@ if pedagogico != "Ninguno - Modo Operativo Activo":
         render_normativo()
 
 else:
-    # Despliegue de Módulos de Operación de Planta en base a la Selección
     if seccion == "Consola SCADA Central":
         st.title("🖥️ Consola Central SCADA - Suite MENFA")
         st.caption("Panel general de supervisión de variables de proceso de producción petrolera y gasífera.")
@@ -132,12 +190,10 @@ else:
         if st.session_state['esd_bloqueo_general']:
             st.error("🚨 PARADA DE EMERGENCIA ACTIVA: Todas las plantas se encuentran aisladas y despresurizadas hacia la antorcha.")
         
-        # Extracción segura de estados dinámicos recalculados por otros módulos
         nivel_separador = st.session_state.get('nivel_liquido', 45.0)
         temp_criogenica = st.session_state.get('t_separador_frio', -65.0)
         eficiencia_lgn = st.session_state.get('rendimiento_liquidos', 85.0)
 
-        # Mapeo de métricas en panel superior
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("Presión Entrada (V-101)", f"{st.session_state['p_entrada']:.1f} kPa")
         col2.metric("Nivel Domo Separador", f"{nivel_separador:.1f} %")
@@ -146,37 +202,30 @@ else:
         
         st.markdown("---")
         
-        # --- NUEVO: GRÁFICO HISTÓRICO / TENDENCIAS DE PROCESO INTEGRADO ---
         st.markdown("### 📈 Historial de Tendencias DCS (Línea de Proceso Integral)")
         
-        # Generamos una curva de simulación basada en el estado actual para simular el histórico del Scada
         import numpy as np
         import plotly.graph_objects as go
         
         t_eje = np.linspace(0, 24, 50)
-        # Ruido blanco operativo normal (simulación de sensores reales)
         ruido_p = np.sin(t_eje) * 15.0 
         ruido_t = np.cos(t_eje) * 0.8
         
         curva_p = np.full(50, st.session_state['p_entrada']) + ruido_p
         curva_t = np.full(50, temp_criogenica) + ruido_t
         
-        # Configuración del gráfico con doble eje Y (Presión vs Temperatura)
         fig_scada = go.Figure()
         
-        # Línea de Presión de Entrada
         fig_scada.add_trace(go.Scatter(
             x=t_eje, y=curva_p, name="Presión Entrada (kPa)",
             line=dict(color="#00cc96", width=2.5), yaxis="y1"
         ))
         
-        # Línea de Temperatura Criogénica
         fig_scada.add_trace(go.Scatter(
             x=t_eje, y=curva_t, name="Temp. Separador Frío (°C)",
             line=dict(color="#636efa", width=2.5, dash="dash"), yaxis="y2"
         ))
         
-        # Diseño estético estilo pantalla de control industrial (DCS)
         fig_scada.update_layout(
             template="plotly_dark",
             height=320,
