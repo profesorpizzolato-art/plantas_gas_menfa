@@ -10,7 +10,8 @@ st.set_page_config(
 )
 
 # --- INICIALIZACIÓN EXPANDIDA DEL ESTADO GLOBAL (MEMORIA OPERATIVA DE PLANTA) ---
-# Variables base de proceso
+
+# 1. Variables Base de Entrada y Colector Principal
 if 'p_entrada' not in st.session_state: st.session_state['p_entrada'] = 3500.0          # kPa
 if 't_entrada' not in st.session_state: st.session_state['t_entrada'] = 22.0            # °C
 if 'caudal_gas' not in st.session_state: st.session_state['caudal_gas'] = 5.0           # MMm³/día
@@ -18,14 +19,28 @@ if 'nivel_liquido' not in st.session_state: st.session_state['nivel_liquido'] = 
 if 'humedad_salida' not in st.session_state: st.session_state['humedad_salida'] = 24.5   # mg/m³
 if 'p_descarga_gasoducto' not in st.session_state: st.session_state['p_descarga_gasoducto'] = 6100.0 # kPa
 
-# Variables de fraccionamiento y tratamiento adicionales
-if 'c2_en_glp' not in st.session_state: st.session_state['c2_en_glp'] = 1.1             # % mol
+# 2. Variables de Tratamiento, Endulzamiento y Calidad
 if 'co2_salida' not in st.session_state: st.session_state['co2_salida'] = 1.5           # % mol
+if 't_reboiler_teg' not in st.session_state: st.session_state['t_reboiler_teg'] = 200.0 # °C
+if 'tasa_glicol' not in st.session_state: st.session_state['tasa_glicol'] = 3.0         # gal/lb H2O
 
-# Variables de control cognitivo e inyección de fallas desde el manual
+# 3. Variables Críticas para la Planta Criogénica y Turboexpansión
+if 'eficiencia_isentropica' not in st.session_state: st.session_state['eficiencia_isentropica'] = 85.0 # %
+if 'rpm_turboexpansor' not in st.session_state: st.session_state['rpm_turboexpansor'] = 22000.0        # RPM
+if 'delta_p_coldbox' not in st.session_state: st.session_state['delta_p_coldbox'] = 50.0               # kPa
+if 't_separador_frio' not in st.session_state: st.session_state['t_separador_frio'] = -65.0            # °C
+if 'caudal_lgn' not in st.session_state: st.session_state['caudal_lgn'] = 120.0                        # m³/día
+if 'apertura_asv' not in st.session_state: st.session_state['apertura_asv'] = 0.0                      # % (Válvula Anti-Surge)
+
+# 4. Variables de Fraccionamiento de LGN (Demetanizadora / Deetanizadora)
+if 'c2_en_glp' not in st.session_state: st.session_state['c2_en_glp'] = 1.1             # % mol
+if 'p_demetanizadora' not in st.session_state: st.session_state['p_demetanizadora'] = 2100.0 # kPa
+
+# 5. Variables de Control Cognitivo e Inyección de Fallas Operativas
 if 'falla_surge_activa' not in st.session_state: st.session_state['falla_surge_activa'] = False
 if 'falla_hidratos_activa' not in st.session_state: st.session_state['falla_hidratos_activa'] = False
 if 'esd_bloqueo_general' not in st.session_state: st.session_state['esd_bloqueo_general'] = False
+
 
 # --- IMPORTACIÓN SEGURA DE LA SUITE MODULAR MENFA ---
 try:
@@ -47,6 +62,7 @@ try:
 except ImportError as e:
     st.error(f"⚠️ Error Crítico en Arquitectura Modular: {e}")
     st.stop()
+
 
 # --- MENÚ LATERAL INDUSTRIAL MENFA ---
 st.sidebar.image("logo_menfa.png", use_container_width=True)
@@ -84,9 +100,10 @@ pedagogico = st.sidebar.radio(
 
 st.sidebar.markdown("---")
 if st.session_state['esd_bloqueo_general']:
-    st.sidebar.error("🚨 SISTEMA EN PARADA DE EMERGENCIA (ESD)")
+    st.sidebar.error("🚨 SISTEMA EN PARADA DE EMBENCIA (ESD)")
 else:
     st.sidebar.success("🟢 DCS Planta Operativa en Línea")
+
 
 # =====================================================================
 # --- ENRUTADOR LOGÍSTICO COMPLETO ---
@@ -109,7 +126,7 @@ else:
     # Despliegue de Módulos de Operación de Planta en base a la Selección
     if seccion == "Consola SCADA Central":
         st.title("🖥️ Consola Central SCADA - Suite MENFA")
-        st.caption("Panel general de supervisión de variables de proceso integradas.")
+        st.caption("Panel general de supervisión de variables de proceso de producción petrolera y gasífera.")
         st.markdown("---")
         
         if st.session_state['esd_bloqueo_general']:
